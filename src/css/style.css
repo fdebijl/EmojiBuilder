@@ -1,0 +1,32 @@
+* {
+    box-sizing: border-box;
+}
+
+svg {
+    overflow: visible !important;
+    width: 100%;
+    height: 100vh;
+}
+
+body {
+    margin: 0;
+}
+
+.drawboard {
+	background: blue;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 85vw;
+	height: 100vh;
+}
+
+.sidebar {
+	/* Display above content on mobile */
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100vh;
+	width: 15vw;
+	background: red;	
+}
