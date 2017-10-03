@@ -1,32 +1,122 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+
 * {
     box-sizing: border-box;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 svg {
     overflow: visible !important;
     width: 100%;
     height: 100vh;
+    position: absolute;
 }
 
 body {
     margin: 0;
 }
 
-.drawboard {
-	background: blue;
+.wrapper {
+	width: 100vw;
+	height: 100vh;
+	top: 0;
+	left: 0;
+	position: absolute;
+}
+
+#drawboard {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 85vw;
 	height: 100vh;
+	display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #CCC;
+    font-size: 20pt;
 }
 
+/* Sidebar ting */
 .sidebar {
 	/* Display above content on mobile */
 	position: absolute;
-	right: 0;
-	top: 0;
-	height: 100vh;
-	width: 15vw;
-	background: red;	
+    display: block;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 15vw;
+    background: #D5BBB1;
+    color: #FFF4E6;
+}
+
+.search {
+    background: #4B3832;
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    top: 0;
+    padding: 5px;
+    height: 60px;
+}
+
+.tab {
+	height: 25px;
+    width: 50%;
+    position: relative;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    display: flex;
+    background: #3C2F2F;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+    float: left;
+}
+
+.selected {
+	stroke: #333333 !important;
+    stroke-dasharray: 0.2;
+    stroke-width: 0.2;
+	animation: 80s selectorStroke infinite;
+}
+
+.dragged {
+	stroke: #626262 !important;
+    stroke-dasharray: 0.2;
+    stroke-width: 0.2;
+	animation: 50s selectorStroke infinite;
+}
+
+@keyframes selectorStroke {
+	from {stroke-dashoffset: 0%;}
+	to {stroke-dashoffset: 100%};
+}
+
+.button {
+	height: 50px;
+    width: 100%;
+    position: relative;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    display: flex;
+    background: #4B3832;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+	border-bottom: 1px solid #FFF4E6;
+}
+
+.tabheader {
+	width: 100%;
+}
+
+.svg-icon {
+    width: 33%;
+    padding: 5px;
 }
