@@ -6,14 +6,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=0.8">
         
-        <!-- Scripts & Styles -->
+        <!-- Styles -->
 		<link rel="stylesheet" type="text/css" href="src/css/style.css">
+		
+		<!-- Libraries -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://code.jquery.com/jquery-migrate-3.0.1.min.js"></script>
         <script src="src/lib/html2canvas.js" type="text/javascript"></script>
         <script src="src/lib/jquery.mobile.min.js" type="text/javascript"></script>
-		<script src="src/js/emojibuilder.js" type="text/javascript"></script>
-        
+		
+		<!-- Own scripts -->
+		<script src="src/js/emojibuilder.js" type="text/javascript"></script> 
         
 		<!-- Favicon -->
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -32,6 +35,12 @@
 			<div class="betanote">
 				<span>This site is currently in beta and only (properly) works with one emoji at the time.</span>
                 <span>For more info visit the <a href="https://github.com/fdebijl/emojibuilder">GitHub page</a>.</span>
+			</div>
+			
+			<div class="controls">
+				<i aria-hidden="true" class="delete"  ></i>
+				<i aria-hidden="true" class="forward" ></i>
+				<i aria-hidden="true" class="backward"></i>
 			</div>
 			
 			<div id="drawboard" ondrop="appendEmoji(event)" ondragover="allowDrop(event)">
