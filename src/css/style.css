@@ -18,6 +18,7 @@ body {
 
 .betanote {
 	position: absolute;
+    width: 85vw;
 }
 
 .wrapper {
@@ -26,6 +27,11 @@ body {
 	top: 0;
 	left: 0;
 	position: absolute;
+    overflow-x: hidden;
+}
+
+.hinter {
+    text-align: center;
 }
 
 #drawboard {
@@ -124,3 +130,32 @@ body {
     width: 33%;
     padding: 5px;
 }
+
+/* Mobile styles */
+@media only screen and (max-width: 768px) {
+    .sidebar{
+        bottom: unset;
+        top: 0;
+        height: 100vh;
+        width: 25vw;
+    }
+}
+
+@media only screen and (max-width: 414px) {
+    .sidebar{
+        bottom: 0;
+        top: unset;
+        height: 15vh;
+        width: 100vw;
+    }
+    
+    .hinter {
+        width: 100vw;
+    }
+    
+    .betanote {
+        width: 100vw;
+        padding: 5px;
+    }
+}
+

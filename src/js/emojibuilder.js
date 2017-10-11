@@ -3,9 +3,13 @@ $(document).ready(function() {
 	const svgdir = "svg/";
     getSVG(svgdir);
 	
-	// Remove the hint from DOM after 15 seconds by fading it out and removing it upon animation completion
+	// Remove the hint and betanote from DOM after 15 seconds by fading it out and removing it upon animation completion
 	setTimeout(function() {
 		$('.hinter').fadeOut("slow", function() {
+			$(this).remove();
+		});
+        
+        $('.betanote').fadeOut("slow", function() {
 			$(this).remove();
 		});
 	}, 15 * 1000);
