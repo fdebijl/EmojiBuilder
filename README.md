@@ -13,6 +13,8 @@ Currently very much in beta, but the follow functionality should be added in sho
 - Selection of paths
 - Deletion of paths
 
+Also see the roadmap project: https://github.com/Fdebijl/EmojiBuilder/projects/1
+
 ## Contributing:
 
 If you have a stellar idea to implement one of the above functions, go ahead and put in a pull request or issue with your suggestion! I dont really adhere to any particular standard, but try to follow best JS practices and some degree of commenting in your code.
