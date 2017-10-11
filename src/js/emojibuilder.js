@@ -85,6 +85,7 @@ function Draggable(elem) {
         this.target.ownerSVGElement.removeEventListener("mouseup", this.endMove)
     }.bind(this)
 
+    // Convert DOM coordinates to SVG coordinates so we can apply a translation to this path accordingly
     function globalToLocalCoords(x, y) {
         var p = elem.ownerSVGElement.createSVGPoint()
         var m = elem.parentNode.getScreenCTM()
