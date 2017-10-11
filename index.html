@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html>
-	
+	<!-- Made by @fdebijl -->
 	<head>
 		<title>Emojibuilder</title>
+        
 		<link rel="stylesheet" type="text/css" href="src/css/style.css">
-        <link rel="stylesheet" type="text/css" href="src/lib/jqueryui/jquery-ui.min.css">
-        <link rel="stylesheet" type="text/css" href="src/lib/jqueryui/jquery-ui.structure.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>		
-        <script src="src/lib/jqueryui/jquery-ui.min.js" type="text/javascript"></script>
-        <script src="src/js/emojibuilder.js" type="text/javascript"></script>
-		
+        <script src="src/js/html2canvas.js" type="text/javascript"></script>        
+		<script src="src/js/emojibuilder.js" type="text/javascript"></script>
+        
 		<!-- Favicon -->
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -24,13 +23,17 @@
 	<body>
 		<div class="wrapper">
 			
+			<div class="betanote">
+				This site is currently in beta and only (properly) works with one emoji at the time
+			</div>
+			
 			<div id="drawboard" ondrop="appendEmoji(event)" ondragover="allowDrop(event)">
 				<span class="hinter">Drop emoji from the right on here</span>
 			</div>
 			
 			<aside class="sidebar">
 				<div class="clear button">Clear canvas</div>
-				<div class="render button">Save as PNG</div>
+				<div class="render button">Save as PNG (broken atm)</div>
                 
                 <nav class="tabs"><div class="tab tabheader">Categories:</div></nav>
                 

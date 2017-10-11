@@ -19,6 +19,20 @@ $(document).ready(function() {
 	$('.clear').click(function(e){
 		$('#drawboard').empty();
 	});
+	
+	// Render the canvas and save as png
+	$('.render').click(function(e){
+		html2canvas(document.getElementById('drawboard'), {
+			onrendered: function(canvas) {
+				let base64blob = canvas.toDataURL("image/png");
+				let download = document.createElement('a');
+				download.href = base64blob;
+				download.download = "emoji.png";
+				download.click();
+			},
+            logging: true
+		});
+	});
 });
 
 // Allow dropping other elements on this element 
