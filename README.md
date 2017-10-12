@@ -6,14 +6,7 @@ Use Twitter's Open Source SVG emoji to build your own emoji/abominations.
 
 ## Roadmap:  
 
-Currently very much in beta, but the follow functionality should be added in short order:
-- Save as PNG
-- Multiple emoji
-- Layer order (reorder z-index of paths)
-- Selection of paths
-- Deletion of paths
-
-Also see the roadmap project: https://github.com/Fdebijl/EmojiBuilder/projects/1
+EmojiBuilder is currently very much in beta, check out the [roadmap project](https://github.com/Fdebijl/EmojiBuilder/projects/1) for all the function that should be implemented shortly. If you think something is missing, put in an issue above!
 
 ## Contributing:
 
