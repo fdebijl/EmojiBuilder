@@ -60,6 +60,14 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
+// Show the emojigrid for this tab (passed as category) in the sidebar
+function showGrid(cat) {
+	// Simple fadeout of the current active grid (ie: any grid) and callback to show the desired grid
+	$('.grid').fadeOut(333, function() {
+		$('.grid_' + cat).show();	
+	});	
+}
+
 // Enable dragging on this element
 function Draggable(elem) {
 	// Rewritten from https://stackoverflow.com/questions/41514967/
@@ -141,16 +149,8 @@ function getSVG(directory) {
         });
 		
 		// Show the 'faces' grid by default
-		showGrid('faces');
+		showGrid("Faces");
     });
-}
-
-// Show the emojigrid for this tab (passed as category) in the sidebar
-function showGrid(cat) {
-	// Simple fadeout of the current active grid (ie: any grid) and callback to show the desired grid
-	$('.grid').fadeOut(333, function() {
-		$('.grid_' + cat).fadeIn(333);	
-	});	
 }
 
 // Add this SVG element to dom
@@ -170,7 +170,6 @@ function addSVG(elem) {
 		// Done, let's make it draggable and selectable
 		$('path').each(function() {
 			new Draggable(this);
-			Touchable(this);
 			
 			// To-do: make selectable by click/dblclick
 		});
