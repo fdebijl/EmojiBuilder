@@ -1,8 +1,11 @@
+/* Global/general styles
+===================================================== */ 
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 
 * {
     box-sizing: border-box;
     font-family: 'Source Sans Pro', sans-serif;
+	color: #FFF;
 }
 
 svg {
@@ -16,6 +19,9 @@ body {
     margin: 0;
 }
 
+/* Main elements
+===================================================== */ 
+
 .betanote {
 	position: absolute;
     width: 85vw;
@@ -27,11 +33,13 @@ body {
 	top: 0;
 	left: 0;
 	position: absolute;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .hinter {
     text-align: center;
+    color: #000;
+    width: 100%;
 }
 
 #drawboard {
@@ -43,32 +51,40 @@ body {
 	display: flex;
     justify-content: center;
     align-items: center;
-    color: #CCC;
     font-size: 20pt;
+	touch-action: none;
 }
 
-/* Sidebar ting */
+.controls {
+	
+}
+
+.controls > i {
+	
+}
+
+.delete {
+	background: url("../../img/delete.png");
+}
+
+.forward {
+	background: url("../../img/forward.png");
+}
+
+.backward {
+	background: url("../../img/backward.png");
+}
+
+/* Sidebar
+===================================================== */ 
 .sidebar {
-	/* Display above content on mobile */
 	position: absolute;
     display: block;
     right: 0;
     top: 0;
     height: 100vh;
-    width: 15vw;
-    background: #D5BBB1;
-    color: #FFF4E6;
-}
-
-.search {
-    background: #4B3832;
-    width: 100%;
-    box-sizing: border-box;
-    display: block;
-    position: absolute;
-    top: 0;
-    padding: 5px;
-    height: 60px;
+    width: 20vw;
+    background: #f3e7e3;
 }
 
 .tab {
@@ -79,13 +95,50 @@ body {
     top: 0;
     right: 0;
     display: flex;
-    background: #3C2F2F;
+    background: #2d2d2d;
     justify-content: center;
     align-items: center;
     padding: 5px;
     cursor: pointer;
     float: left;
 }
+
+.button {
+	height: 50px;
+    width: 100%;
+    position: relative;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    display: flex;
+    background: #2d2d2d;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+	border-bottom: 1px solid #FFF;
+}
+
+.tabheader {
+	width: 100%;
+}
+
+.svg-icon {
+    width: 33%;
+    padding: 5px;
+}
+
+.grid {
+	display: none;
+	overflow-y: scroll;
+    width: 20vw;
+	height: 80vh;
+    height: -webkit-fill-available;
+    width: -moz-available;
+}
+
+/* SVG-specific styles
+===================================================== */ 
 
 .selected {
 	stroke: #333333 !important;
@@ -106,34 +159,12 @@ body {
 	to {stroke-dashoffset: 100%};
 }
 
-.button {
-	height: 50px;
-    width: 100%;
-    position: relative;
-    z-index: 100;
-    top: 0;
-    right: 0;
-    display: flex;
-    background: #4B3832;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    cursor: pointer;
-	border-bottom: 1px solid #FFF4E6;
-}
 
-.tabheader {
-	width: 100%;
-}
+/* Mobile styles
+===================================================== */ 
 
-.svg-icon {
-    width: 33%;
-    padding: 5px;
-}
-
-/* Mobile styles */
-@media only screen and (max-width: 768px) {
-    .sidebar{
+@media only screen and (max-device-width: 768px) {
+    .sidebar {
         bottom: unset;
         top: 0;
         height: 100vh;
@@ -141,9 +172,9 @@ body {
     }
 }
 
-@media only screen and (max-width: 414px) {
-    .sidebar{
-        bottom: 0;
+@media only screen and (max-device-width: 414px) {
+    .sidebar {
+        bottom: -50px;
         top: unset;
         height: 15vh;
         width: 100vw;
@@ -156,6 +187,21 @@ body {
     .betanote {
         width: 100vw;
         padding: 5px;
+    }
+    
+    .wrapper {
+        overflow: visible;
+        overflow-x: hidden;
+    }
+    
+    .grid {
+        overflow-y: visible;
+        width: 100vw;
+        height: unset;
+    }
+    
+    #drawboard {
+        width: 100vw;
     }
 }
 

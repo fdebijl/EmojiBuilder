@@ -23,8 +23,8 @@ $(document).ready(function() {
 	$('.clear').click(function(e){
 		$('#drawboard').empty();
 	});
-	
-	// Render the canvas and save as png
+		
+	// Render the canvas and save as png when the "Save as PNG" button is clicked
 	$('.render').click(function(e){
 		html2canvas(document.getElementById('drawboard'), {
 			onrendered: function(canvas) {
@@ -38,59 +38,78 @@ $(document).ready(function() {
 		});
 	});
 });
-
+	
+// allowDrop is used on the drawboard to allow emoji from the sidebar to be dropped on there. Called from index.html#drawboard.
 // Allow dropping other elements on this element 
-function allowDrop(e) {
-	e.preventDefault();
+function allowDrop(evt) {
+	evt.preventDefault();
 }
 
+// appendEmoji is used when an element is dropped onto the drawboard. Called from index.html#drawboard.
 // Translate dropped imgs to function call on addSVG()
-function appendEmoji(e) {
-	addSVG(document.getElementById(e.dataTransfer.getData("text/html")), e.clientX, e.clientY);
+function appendEmoji(evt) {
+	addSVG(document.getElementById(evt.dataTransfer.getData("text/html")), evt.clientX, evt.clientY);
 }
 
 // Pass the source element when dragging images so appendEmoji() can parse them onto the drawboard
-function appendSource(e) {
-	e.dataTransfer.setData('text/html', e.target.id);
+function appendSource(evt) {
+	e.dataTransfer.setData('text/html', evt.target.id);
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+// Show the emojigrid for this tab (passed as category) in the sidebar
+function showGrid(cat) {
+	// Simple fadeout of the current active grid (ie: any grid) and callback to show the desired grid
+	$('.grid').fadeOut(333, function() {
+		$('.grid_' + cat).show();	
+	});	
 }
 
 // Enable dragging on this element
 function Draggable(elem) {
-    this.target = elem
-    this.clickPoint = this.target.ownerSVGElement.createSVGPoint()
-    this.lastMove = this.target.ownerSVGElement.createSVGPoint()
-    this.currentMove = this.target.ownerSVGElement.createSVGPoint()
-    this.target.addEventListener("mousedown", this)
-    this.handleEvent = function(evt) {
-        evt.preventDefault()
-        this.clickPoint = globalToLocalCoords(evt.clientX, evt.clientY)
-        this.target.classList.add("dragged")
-        this.target.setAttribute("pointer-events", "none")
-        this.target.ownerSVGElement.addEventListener("mousemove", this.move)
-        this.target.ownerSVGElement.addEventListener("mouseup", this.endMove)
-    }
-    this.move = function(evt) {
-        var p = globalToLocalCoords(evt.clientX, evt.clientY)
-        this.currentMove.x = this.lastMove.x + (p.x - this.clickPoint.x)
-        this.currentMove.y = this.lastMove.y + (p.y - this.clickPoint.y)
-        this.target.setAttribute("transform", "translate(" + this.currentMove.x + "," + this.currentMove.y + ")")
-    }.bind(this)
-
-    this.endMove = function(evt) {
-        this.lastMove.x = this.currentMove.x
-        this.lastMove.y = this.currentMove.y
-        this.target.classList.remove("dragged")
-        this.target.setAttribute("pointer-events", "all")
-        this.target.ownerSVGElement.removeEventListener("mousemove", this.move)
-        this.target.ownerSVGElement.removeEventListener("mouseup", this.endMove)
-    }.bind(this)
-
+	// Rewritten from https://stackoverflow.com/questions/41514967/
+    let target = elem;
+	
+	// Create SVG points for capturing...
+	// clickpoint: ... where the cursor is relative to the rest of the path
+	// lastMove: ... the last transformation applied to this element
+	// currentMove .. the current transformation to apply
+	let lastMove    = target.ownerSVGElement.createSVGPoint();
+    let clickPoint  = target.ownerSVGElement.createSVGPoint();
+    let currentMove = target.ownerSVGElement.createSVGPoint();
+	
+	$(target).on("vmousedown", function(evt) {
+        evt.preventDefault();
+        clickPoint = globalToLocalCoords(evt.clientX, evt.clientY);
+        target.classList.add("dragged");
+        target.setAttribute("pointer-events", "none");
+        $(target.ownerSVGElement).on("vmousemove", target, function(evt) {
+			let p = globalToLocalCoords(evt.clientX, evt.clientY);
+			currentMove.x = lastMove.x + (p.x - clickPoint.x);
+			currentMove.y = lastMove.y + (p.y - clickPoint.y);
+			target.setAttribute("transform", "translate(" + currentMove.x + "," + currentMove.y + ")");
+		});
+		
+        $(target.ownerSVGElement).on("vmouseup", target, function(evt) {
+			lastMove.x = currentMove.x;
+			lastMove.y = currentMove.y;
+			target.classList.remove("dragged");
+			target.setAttribute("pointer-events", "all");
+			$(target.ownerSVGElement).off("vmousemove");
+			$(target.ownerSVGElement).off("vmouseup");
+		});
+    });
+	
+    // Convert DOM coordinates to SVG coordinates so we can apply a translation to this path accordingly
     function globalToLocalCoords(x, y) {
-        var p = elem.ownerSVGElement.createSVGPoint()
-        var m = elem.parentNode.getScreenCTM()
-        p.x = x
-        p.y = y
-        return p.matrixTransform(m.inverse())
+        let p = target.ownerSVGElement.createSVGPoint();
+        let m = target.parentNode.getScreenCTM();
+        p.x = x;
+        p.y = y;
+        return p.matrixTransform(m.inverse());
 	}
 }
 
@@ -107,27 +126,35 @@ function getSVG(directory) {
         for (i = 0; i < d.length; i++) {
             // Append current category (d[i].name) to emojigrid and tabmenu
             $(".emojigrid").append('<div class="grid grid_' + d[i].name + '"></div>');
-            $(".tabs").append('<div class="tab tab_' + d[i].name + '">' + d[i].name + '</div>');
+            $(".tabs").append('<div class="tab tab_' + d[i].name + '" data-cat="' + d[i].name + '">' + capitalizeFirstLetter(d[i].name) + '</div>');
             
 			// Iterate over files in directory d[i]
             for (j = 0; j < d[i].dir.length; j++) {
                 // Root = "svg/"
                 // d[1].name = faces/objects/etc
                 // d[i].dir[i].file = filename
-                let filestring = '<img draggable="true" ondragstart="appendSource(event)" class="svg-icon" id="' + d[i].dir[j].file.split(".")[0] + '" src="' + root + d[i].name + "/" + d[i].dir[j].file + '" data-cat="' + d[i].name + '">';				
+                let filestring = '<img draggable="true" ondragstart="appendSource(event)" class="svg-icon" id="' + d[i].dir[j].file.split(".")[0] + '" src="' + root + d[i].name + "/" + d[i].dir[j].file + '">';				
                 $(".grid_" + d[i].name).append($.parseHTML(filestring));
             }
         }
         
+		// Bind showGrid to each tab to show the emojigrid for the corresponding category
+		$('.tabs > div').click(function() {
+			showGrid($(this).data('cat'));
+		});
+		
 		// Bind addSVG to each img to allow click-to-add to the drawboard
         $('.svg-icon').click(function(e) {
             addSVG(this); 
         });
+		
+		// Show the 'faces' grid by default
+		showGrid("Faces");
     });
 }
 
-// Add this SVG element to dom. x/y may be ommitted 
-function addSVG(el, x, y) {
+// Add this SVG element to dom
+function addSVG(elem) {
 	// Append staging area to DOM to load SVG in. $.load is destructive so we need a proxy element to prevent clearing the drawboard
 	let stager = '<div class="stagingarea" style="display: none;"></div>';
 	$('.wrapper').append($.parseHTML(stager));
@@ -136,17 +163,15 @@ function addSVG(el, x, y) {
 	$('.hinter').remove();
 	
 	// Append the SVG file to the staging area and subsequently move to the drawboard
-	$('.stagingarea').load(el.src, function() {
+	$('.stagingarea').load(elem.src, function() {
 		// Aaaaand move it to the drawboard
 		$('#drawboard').append($('.stagingarea').html());
 		
 		// Done, let's make it draggable and selectable
 		$('path').each(function() {
 			new Draggable(this);
-			$(this).dblclick(function(e) {
-				$('path').removeClass('selected');
-				$(this).addClass('selected');
-			});
+			
+			// To-do: make selectable by click/dblclick
 		});
 		
 		// Remove all clipping paths that prevent SVG movement outside of the bounding box. Also metadata because there's really no good reason to have it in here for our purposes.
@@ -159,8 +184,12 @@ function addSVG(el, x, y) {
 }
 
 // Listen for delete keypress and delete the currently selected path
-$('html').keyup(function(e){
-    if(e.keyCode == 46) {
+$('html').keyup(function(evt) {
+    if (evt.keyCode == 46) {
         $('.selected').remove();
     }
 });
+
+//$("p").click(function() {
+//   $(this).insertBefore($(this).prev()); 
+//});
