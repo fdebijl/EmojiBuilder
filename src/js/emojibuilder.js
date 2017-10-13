@@ -15,7 +15,7 @@ $(document).ready(function() {
 	}, 15 * 1000);
 	
 	// Remove selection when clicking anywhere on the drawboard
-	$('.drawboard').click(function(e) {
+	$('#drawboard').click(function(e) {
 		$('path').removeClass('selected');
 	});
 
@@ -53,7 +53,7 @@ function appendEmoji(evt) {
 
 // Pass the source element when dragging images so appendEmoji() can parse them onto the drawboard
 function appendSource(evt) {
-	e.dataTransfer.setData('text/html', evt.target.id);
+	evt.dataTransfer.setData('text/html', evt.target.id);
 }
 
 function capitalizeFirstLetter(string) {
@@ -84,8 +84,7 @@ function Draggable(elem) {
 	$(target).on("vmousedown", function(evt) {
         evt.preventDefault();
         clickPoint = globalToLocalCoords(evt.clientX, evt.clientY);
-        target.classList.add("dragged");
-        target.setAttribute("pointer-events", "none");
+        $(target).addClass("dragged");
         $(target.ownerSVGElement).on("vmousemove", target, function(evt) {
 			let p = globalToLocalCoords(evt.clientX, evt.clientY);
 			currentMove.x = lastMove.x + (p.x - clickPoint.x);
@@ -96,8 +95,7 @@ function Draggable(elem) {
         $(target.ownerSVGElement).on("vmouseup", target, function(evt) {
 			lastMove.x = currentMove.x;
 			lastMove.y = currentMove.y;
-			target.classList.remove("dragged");
-			target.setAttribute("pointer-events", "all");
+			$(target).removeClass("dragged");
 			$(target.ownerSVGElement).off("vmousemove");
 			$(target.ownerSVGElement).off("vmouseup");
 		});
@@ -138,7 +136,7 @@ function getSVG(directory) {
             }
         }
         
-		// Bind showGrid to each tab to show the emojigrid for the corresponding category
+		// Bind showGrid() to each tab to show the emojigrid for the corresponding category
 		$('.tabs > div').click(function() {
 			showGrid($(this).data('cat'));
 		});
@@ -149,11 +147,11 @@ function getSVG(directory) {
         });
 		
 		// Show the 'faces' grid by default
-		showGrid("Faces");
+		showGrid("faces");
     });
 }
 
-// Add this SVG element to dom
+// Add this SVG element to the drawboard
 function addSVG(elem) {
 	// Append staging area to DOM to load SVG in. $.load is destructive so we need a proxy element to prevent clearing the drawboard
 	let stager = '<div class="stagingarea" style="display: none;"></div>';
@@ -166,20 +164,25 @@ function addSVG(elem) {
 	$('.stagingarea').load(elem.src, function() {
 		// Aaaaand move it to the drawboard
 		$('#drawboard').append($('.stagingarea').html());
-		
-		// Done, let's make it draggable and selectable
-		$('path').each(function() {
-			new Draggable(this);
-			
-			// To-do: make selectable by click/dblclick
-		});
-		
+
 		// Remove all clipping paths that prevent SVG movement outside of the bounding box. Also metadata because there's really no good reason to have it in here for our purposes.
 		$('defs').remove();
 		$('metadata').remove();
 		
 		// Destroy the staging area
 		$('.stagingarea').remove();
+		
+		// Done, let's make it draggable
+		$('path').each(function() {
+			new Draggable(this);
+			
+			// Make each path selectable by click
+			$(this).on("vclick", function(evt) {
+				console.log(evt);
+				$('path').removeClass('selected');
+				$(evt.target).addClass('selected');
+			});
+		});
 	}); 
 }
 
