@@ -60,6 +60,6 @@ function dir_to_json($dir)
         return $data;
 }
 
-echo dir_to_json("./svg")
+file_put_contents("svgs.json", dir_to_json("./svg"), LOCK_EX);
 
 ?>

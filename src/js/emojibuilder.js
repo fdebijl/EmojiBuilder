@@ -114,7 +114,7 @@ function Draggable(elem) {
 // Retrieve all files from a given directory
 function getSVG(directory) {
     $.ajax({
-        url: "svg.php",
+        url: "svgs.json",
     })
     .done( function(data) {
 		let root = directory;
