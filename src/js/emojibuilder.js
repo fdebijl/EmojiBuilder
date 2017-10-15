@@ -3,29 +3,31 @@ $(document).ready(function() {
 	const svgdir = "svg/";
     getSVG(svgdir);
 	
-	// Remove the hint and betanote from DOM after 15 seconds by fading it out and removing it upon animation completion
+	// Remove the hint from DOM after 15 seconds by fading it out and removing it upon animation completion
 	setTimeout(function() {
 		$('.hinter').fadeOut("slow", function() {
-			$(this).remove();
-		});
-        
-        $('.betanote').fadeOut("slow", function() {
 			$(this).remove();
 		});
 	}, 15 * 1000);
 	
 	// Remove selection when clicking anywhere on the drawboard
-	$('#drawboard').click(function(e) {
+	$('#drawboard').click(function(evt) {
 		$('path').removeClass('selected');
 	});
 
 	// Clear the canvas when the reset button is clicked
-	$('.clear').click(function(e){
+	$('.clear').click(function(evt){
 		$('#drawboard').empty();
+	});
+	
+	// Show more information about the app when clicking on the 'i'-icon
+	$('.info').on("vclick", function(evt) {
+		$('.info').toggleClass('collapsed');
 	});
 		
 	// Render the canvas and save as png when the "Save as PNG" button is clicked
-	$('.render').click(function(e){
+	// TODO: Fix SVG rendering
+	$('.download').click(function(evt){
 		html2canvas(document.getElementById('drawboard'), {
 			onrendered: function(canvas) {
 				let base64blob = canvas.toDataURL("image/png");
@@ -36,6 +38,20 @@ $(document).ready(function() {
 			},
             logging: true
 		});
+	});
+	
+	// Enable functionality on the controls
+	$('.delete').click(function(e) {
+		$('.selected').remove();
+	});
+	
+	$('.forward').click(function(e){
+		$('.selected').parent().insertAfter($('.selected').parent().next()); 
+		
+	});
+	
+	$('.backward').click(function(e){
+		$('.selected').parent().insertBefore($('.selected').parent().prev()); 
 	});
 });
 	
@@ -178,7 +194,6 @@ function addSVG(elem) {
 			
 			// Make each path selectable by click
 			$(this).on("vclick", function(evt) {
-				console.log(evt);
 				$('path').removeClass('selected');
 				$(evt.target).addClass('selected');
 			});
@@ -192,7 +207,3 @@ $('html').keyup(function(evt) {
         $('.selected').remove();
     }
 });
-
-//$("p").click(function() {
-//   $(this).insertBefore($(this).prev()); 
-//});

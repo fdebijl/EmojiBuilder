@@ -32,15 +32,25 @@
 	<body>
 		<div class="wrapper">
 			
-			<div class="betanote">
-				<span>This site is currently in beta and only (properly) works with one emoji at the time.</span>
-                <span>For more info visit the <a href="https://github.com/fdebijl/emojibuilder">GitHub page</a>.</span>
-			</div>
+			<div class="info collapsed" role="contentinfo">EmojiBuilder by <a href="https://twitter.com/fdebijl" title="Author's Twitter account">@fdebijl</a>
+				This site is currently in <b>beta</b> and only (properly) works with one emoji at the time.
+                For more info, or to help me out finish this site, visit the <a href="https://github.com/fdebijl/emojibuilder" title="GitHub for EmojiBuilder">GitHub page</a>.
+				
+				<b>Controls:</b>
+				Click any emoji on the right or drag them in to start editing.
+				You can select any path by clicking on it once. To deselect a path, click anywhere on the drawboard.
+				To delete a path, press 'Delete' on your keyboard or click the garbage bin icon in the lower left.</div>
 			
 			<div class="controls">
-				<i aria-hidden="true" class="delete"  ></i>
-				<i aria-hidden="true" class="forward" ></i>
-				<i aria-hidden="true" class="backward"></i>
+				<div class="group">
+					<i class="clear">	<span class="tooltip">Clear all emoji from the canvas.</span></i>
+					<i class="download"><span class="tooltip">Download the emoji as PNG</span></i>
+				</div>
+				<div class="group">
+					<i class="delete">	<span class="tooltip">Delete the currently selected path</span></i>
+					<i class="forward">	<span class="tooltip">Bring the currently selected layer forward</span></i>
+					<i class="backward"><span class="tooltip">Push the currently selected layer backward</span></i>
+				</div>
 			</div>
 			
 			<div id="drawboard" ondrop="appendEmoji(event)" ondragover="allowDrop(event)">
@@ -48,8 +58,6 @@
 			</div>
 			
 			<aside class="sidebar">
-				<div class="clear button">Clear canvas</div>
-				<div class="render button">Save as PNG (broken atm)</div>
                 
                 <nav class="tabs"><div class="tab tabheader">Categories:</div></nav>
                 
