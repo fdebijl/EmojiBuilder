@@ -26,18 +26,84 @@ $(document).ready(function() {
 	});
 		
 	// Render the canvas and save as png when the "Save as PNG" button is clicked
-	// TODO: Fix SVG rendering
-	$('.download').click(function(evt){
-		html2canvas(document.getElementById('drawboard'), {
-			onrendered: function(canvas) {
-				let base64blob = canvas.toDataURL("image/png");
-				let download = document.createElement('a');
-				download.href = base64blob;
-				download.download = "emoji.png";
-				download.click();
-			},
-            logging: true
-		});
+	$('.download').click(function(evt) {
+		// Hit that loading icon
+		$('.wrapper').addClass('loading');
+		
+		// Make a temporary canvas to dump all the SVG to and append it to DOM
+		let renderbox = '<canvas id="renderbox"></canvas>';
+		$('.wrapper').append($.parseHTML(renderbox));
+		
+		// Set the appropriate dimensions for the renderbox and SVG elements so canvg doesn't get confused from the 100%/100vh we have on the SVGs
+		$('#renderbox, #drawboard > svg').width($('#drawboard').outerWidth());
+		$('#renderbox, #drawboard > svg').height($('#drawboard').outerHeight());
+		
+		// Get all the SVG elements on the drawboard and save it as a string canvg will use later on
+		let drawboardContent = "";
+		
+		// If we have just one emoji, we only need the base HTML
+		if ($('#drawboard > svg').length === 1) {
+			// Remove all comments and strip whitespace from the single SVG element
+			drawboardContent = $.trim($('#drawboard').html().replace(/<!--[\s\S]*?-->/gi, ""));
+		} else {
+			// If we have more than one emoji we'll need to merge them to one grand SVG, for this we need a new element to do some DOM manipulation
+			let mergehelper = '<div class="mergehelper" style="display: none;"></div>';
+			$('.wrapper').append($.parseHTML(mergehelper));
+			$('.mergehelper').html($('#drawboard').html());
+			
+			// Remove all XML comments to prevent fuckery later on
+			$('.mergehelper').html($('.mergehelper').html().replace(/<!--[\s\S]*?-->/gi, ""));
+			
+			let SVGinMergeHelper = $('.mergehelper > svg');
+			console.log(SVGinMergeHelper[0]);
+			
+			// Append all subsequent SVG elements to the first
+			for (i = 1; i < SVGinMergeHelper.length; i++ ) {
+				let t = $(SVGinMergeHelper[i]).html();
+				$('.mergehelper > svg').eq(0).append(t);
+				$(SVGinMergeHelper[i]).remove();
+				console.log(i);
+			}
+			
+			drawboardContent = $.trim($('.mergehelper').html());
+			console.log(drawboardContent);	
+		}
+		
+		// Reset the dimensions on the SVGs in the drawboard
+		$('svg').css('width', 'auto').css('height', 'auto');
+		
+		// Convert the SVG in the renderbox to static canvas bitmap
+		// In the renderCallback from canvg we render out the canvas we just created with html2canvas
+		canvg(
+			'renderbox',
+			drawboardContent,
+			{
+				ignoreMouse: true,
+				ignoreAnimation: true,
+				renderCallback: function() {
+					// Wait 1 second for each SVG to make sure canvg is done rendering
+					setTimeout(function() {
+						html2canvas(document.getElementById('renderbox'), {
+							onrendered: function(canvas) {
+								// Convert the renderbox-canvas to a PNG base64 blob
+								let base64blob = canvas.toDataURL("image/png");
+								// Create a phantom anchor to download the base64blob as emoji.png
+								let download = document.createElement('a');
+								download.href = base64blob;
+								download.download = "emoji.png";
+								download.click();
+								
+								// Remove all temporary elements from DOM
+								$(download).remove();
+								$('.wrapper').removeClass('loading');
+								$('#renderbox').remove();
+								$('.mergehelper').remove();
+							}
+						});
+					}, $('#drawboard > svg').length * 1 * 1000);
+				}
+			}
+		);	
 	});
 	
 	// Enable functionality on the controls

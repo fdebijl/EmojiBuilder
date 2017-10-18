@@ -4,4 +4,4 @@ RewriteCond %{HTTP_HOST} ^((?!www\.)[^.]+)\.debijl\.xyz$
 RewriteRule ^ https://%1.debijl.xyz%{REQUEST_URI} [NE,L,R]
 
 FileETag MTime Size
-Header set Cache-Control "max-age=604800, public"
+Header set Cache-Control "max-age=86400, public"
