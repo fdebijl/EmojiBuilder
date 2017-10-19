@@ -27,7 +27,7 @@ $(document).ready(function() {
 		
 	// Render the canvas and save as png when the "Save as PNG" button is clicked
 	$('.download').click(function(evt) {
-		// Hit that loading icon
+		// Show loading overlay
 		$('.wrapper').addClass('loading');
 		
 		// Make a temporary canvas to dump all the SVG to and append it to DOM
@@ -83,23 +83,18 @@ $(document).ready(function() {
 				renderCallback: function() {
 					// Wait 1 second for each SVG to make sure canvg is done rendering
 					setTimeout(function() {
-						html2canvas(document.getElementById('renderbox'), {
-							onrendered: function(canvas) {
-								// Convert the renderbox-canvas to a PNG base64 blob
-								let base64blob = canvas.toDataURL("image/png");
-								// Create a phantom anchor to download the base64blob as emoji.png
-								let download = document.createElement('a');
-								download.href = base64blob;
-								download.download = "emoji.png";
-								download.click();
-								
-								// Remove all temporary elements from DOM
-								$(download).remove();
-								$('.wrapper').removeClass('loading');
-								$('#renderbox').remove();
-								$('.mergehelper').remove();
-							}
-						});
+						let EmojiAsCanvas = document.getElementById('renderbox');
+						let base64blob = EmojiAsCanvas.toDataURL("image/png");
+						let download = document.createElement('a');
+						download.href = base64blob;
+						download.download = "emoji.png";
+						download.click();
+						
+						// Remove all temporary elements from DOM
+						$(download).remove();
+						$('.wrapper').removeClass('loading');
+						$('#renderbox').remove();
+						$('.mergehelper').remove();
 					}, $('#drawboard > svg').length * 1 * 1000);
 				}
 			}
