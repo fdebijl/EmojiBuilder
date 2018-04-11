@@ -20,6 +20,11 @@ svg {
 body {
     margin: 0;
 	color: #FFF;
+	overflow: hidden;
+}
+
+.hidden {
+    display: none;
 }
 
 /* Main elements
@@ -52,7 +57,7 @@ g {
 	width: 50px;
 	height: 50px;
 	box-shadow: none;
-	background: url(../../img/info.png);
+	background: url(../img/info.png);
 	background-size: contain;
 	overflow: hidden;
 	color: #FFF;
@@ -96,138 +101,105 @@ g {
 	left: 0;
 }
 
-/* Controls
+/* On-page controls
 ===================================================== */ 
-.controls {
-	position: absolute;
+
+.inline-controls {
+    position: absolute;
     bottom: 5px;
     left: 5px;
     width: 50px;
-	z-index: 5;
+    z-index: 5;
 }
-
-/* Apply a border to the first controlgroup to distinguish between selected controls and global controls */
-.controls > .group:nth-of-type(1) {
-	border-bottom: 1px solid #ababab;
-	padding-bottom: 6px;
-}
-
-.controls > .group:nth-of-type(2) {
-	padding-top: 6px;
-}
-
-.controls > div > i {
-	width: 50px;
+ 
+.inline-controls > div > i {
+    width: 50px;
     height: 50px;
     display: block;
     background-size: contain;
     cursor: pointer;
     margin: 0;
     padding: 0;
-	transition: 333ms all ease;
+    transition: 333ms all ease;
 }
-
-.controls > div > i:hover {
-	box-shadow: inset 0px 0 16px 0px rgba(0, 0, 0, 0.3);
-	transform: scale(1.1);
+ 
+.inline-controls > div > i:hover {
+    box-shadow: inset 0px 0 16px 0px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
 }
-
-.controls > div > i > span {
-	opacity: 0;
-}
-
-.controls > div > i:hover > span {
-	opacity: 1;
-	color: #FFF;
-	display: flex;
-    position: relative;
-    width: 200px;
-	height: 50px;
-	justify-content: center;
-	align-content: center;
-	text-align: center;
-	/* Text should not be so long as to overflow, but in the spirit of graceful degradation we will catch this fault here */
-    overflow: visible;
-    font-style: normal;
-    font-size: 16px;
-	padding: 5px;
-    left: 75px;
-	background: #2d2d2d;
-	border-radius: 3px;
-	/* Delay tooltip opening with 666ms */
-	transition: opacity 0s linear 666ms;
-}
-
-.controls > div > i:hover > span:after {
-	content: " ";
-    position: absolute;
-    top: 35%;
-    right: 100%;
-    margin-left: -5px;
-    border-width: 7px;
-    border-style: solid;
-    border-color: transparent #2d2d2d transparent transparent;
-}
-
-.clear {
-	background: url("../../img/clear.png");
-	background-size: 30px !important;
+ 
+.inline-controls > .group > .clear {
+    background: url("../img/clear.png");
+    background-size: 30px !important;
     background-repeat: no-repeat;
     background-position: center;
 }
-
-.download {
-	background: url("../../img/download.png");
+ 
+.inline-controls > .group > .download {
+    background: url("../img/download.png");
 }
-
-.delete {
-	background: url("../../img/delete.png");
-	background-size: 30px !important;
+ 
+.inline-controls > .group > .delete {
+    background: url("../img/delete.png");
+    background-size: 30px !important;
     background-repeat: no-repeat;
     background-position: center;
 }
-
-.forward {
-	background: url("../../img/forward.png");
+ 
+.inline-controls > .group > .forward {
+    background: url("../img/forward.png");
+    background-size: contain;
+}
+ 
+.inline-controls > .group > .backward {
+    background: url("../img/backward.png");
+    background-size: contain;
 }
 
-.backward {
-	background: url("../../img/backward.png");
-}
-
-/* Loading modal
+/* Modals
 ===================================================== */ 
-
-.modal {
-	display: none;
+.uk-modal {
+	color: #000;
 }
 
-.loading .modal {
-	width: 100vw;
-	height: 100vh;
-	display: flex;
-	position: fixed;
-	top: 0;
-	left: 0;
-	padding: 0;
-	margin: 0;
-	align-content: center;
-	justify-content: center;
-	text-align: center;
-	flex-flow: column nowrap;
-	background: rgba(0, 0, 0, 0.5);
-    z-index: 25;
+#loading-modal {
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    flex-flow: column;
 	font-size: 25pt;
 }
 
-.modal span {
-	padding: 10px;
+#loading-modal.uk-open {
+    display: flex !important;
 }
+
+#info-modal {
+    white-space: pre-line;
+}
+
+.uk-modal .uk-card {
+    padding: 10px;
+    margin: 30px 0px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.15);
+    transition: box-shadow .3s ease-in-out;
+}
+
+.uk-modal .uk-card:hover {
+    padding: 10px;
+    margin: 30px 0px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.25);
+}
+   
 
 /* Sidebar
 ===================================================== */ 
 .sidebar {
-	position: absolute;
+    position: relative;
+    float: right;
     display: block;
     right: 0;
     top: 0;
@@ -236,26 +208,28 @@ g {
     background: #f3e7e3;
 }
 
-.tab {
-	height: 25px;
-    width: 48%;
-    position: relative;
-    z-index: 10;
-    top: 0;
-    right: 0;
+.tabs {
     display: flex;
+    flex-flow: row wrap;
+}
+
+.tab {
     background: #2d2d2d;
+    flex: 1 1 50%;
+    display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
+    padding: 8px;
     cursor: pointer;
-    float: left;
-    margin: 3px;
+    transition: 333ms all cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.tab.tab_active {
+    background: #333;
 }
 
 .tabheader {
-	width: 100%;
-	margin: 0 0 5px 0;
+    flex: 1 1 100%;
 }
 
 .svg-icon {
@@ -270,6 +244,52 @@ g {
 	height: 80vh;
     height: -webkit-fill-available;
     width: -moz-available;
+}
+
+/* Menubar
+===================================================== */ 
+.menubar {
+    background: #2d2d2d !important;
+    color: #FFF;
+    z-index: 5;
+}
+
+.menubar > .uk-navbar-left > .uk-navbar-nav > li > a {
+    color: #FFF;
+    font-family: 'Source Sans Pro', sans-serif;
+    text-transform: capitalize;
+    font-size: 16px;
+    height: 50px;
+}
+
+.menubar .uk-navbar-dropdown {
+    margin-top: 0;
+    margin: 0;
+    padding: 10px;
+    background: #2d2d2d;
+}
+
+.menubar .uk-navbar-dropdown-nav {
+    font-size: 1rem;
+}
+
+.menubar .uk-navbar-dropdown-nav > li > a {
+    padding: 5px;
+    color: #EEE;
+}
+
+.menubar .uk-navbar-dropdown-nav>li>a:hover {
+    color: #FFF;
+    background: #0078d7;  
+}
+
+.menubar .uk-navbar-item {
+    height: unset !important;
+}
+
+.menubar .nav-logo {
+    height: 25px;
+    width: 25px;
 }
 
 /* SVG-specific styles
@@ -335,7 +355,7 @@ g {
     }
 	
 	.controls {
-		bottom 65px;
+		bottom: 65px;
 	}
 	
 	.info {
@@ -343,3 +363,9 @@ g {
 	}
 }
 
+path:after {
+	content: "";
+	display: block;
+	position: relative;
+	z-index: 1000;
+}

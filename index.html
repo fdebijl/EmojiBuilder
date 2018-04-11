@@ -2,26 +2,55 @@
 <html>
 	<!-- Made by @fdebijl -->
 	<head>
-		<title>Emojibuilder</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=0.8">
-        
-        <!-- Styles -->
-		<link rel="stylesheet" type="text/css" href="src/css/style.css">
+
+		<!-- It takes an awfully    L O N G   T A G    to make a long CSP -->
+		<meta http-equiv="Content-Security-Policy" content="
+			default-src 'none'; 
+			require-sri-for script;
+			font-src
+				https://fonts.gstatic.com;
+			connect-src
+				'self' 
+				https://floris.amsterdam/;
+			img-src
+				'self'
+				data:;
+			style-src
+				'self' 
+				'unsafe-inline' 
+				https://fonts.googleapis.com 
+				https://cdnjs.cloudflare.com;
+			script-src 
+				'self' 
+				'sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=' 
+				'sha256-E3NHJIUaclYHEQ6uRnkvD72rAmbJYVJ92sCOU/0Rd7s=' 
+				'sha256-z0ybUvK00h8AqV0PKBU381T4kbU/nfbEQ5wJOi5jGvk=' 
+				'sha256-Ti7RXxxd0Dfe925iP04cmKfhZjcFzV2NNZwolffMY2o=' 
+				'sha256-gS9x7L+zPeuIJQi5Ozx6nkmnAKegHZGdx/Zy/jOs/Ao='
+				'sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=';
+		">
+
+		<title>Emojibuilder</title>
+		<meta name="description" content="Construct (or destruct) emoji and other abominations from Twitter's open-source emoji.">
+
+		<style>.ui-loader{display: none;}</style>
 		
 		<!-- Libraries -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://code.jquery.com/jquery-migrate-3.0.1.min.js"></script>
-        <script src="src/lib/jquery.mobile.min.js" type="text/javascript"></script>
-		<script type="text/javascript" src="https://canvg.github.io/canvg/rgbcolor.js"></script> 
-		<script type="text/javascript" src="https://canvg.github.io/canvg/StackBlur.js"></script>
-		<script type="text/javascript" src="https://canvg.github.io/canvg/canvg.js"></script> 
-        <script type="text/javascript" src="src/lib/raphael.min.js"></script>
-		<script type="text/javascript" src="src/lib/raphael.free_transform.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" type="text/javascript" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+		<script src="js/emojibuilder.js"></script>
+
+		<script async src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js" integrity="sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=" crossorigin="anonymous"></script>
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.js" type="text/javascript" integrity="sha256-E3NHJIUaclYHEQ6uRnkvD72rAmbJYVJ92sCOU/0Rd7s=" crossorigin="anonymous"></script>
+		<script async src="https://canvg.github.io/canvg/rgbcolor.js" type="text/javascript" integrity="sha256-z0ybUvK00h8AqV0PKBU381T4kbU/nfbEQ5wJOi5jGvk=" crossorigin="anonymous"></script> 
+		<script async src="https://canvg.github.io/canvg/StackBlur.js" type="text/javascript" integrity="sha256-Ti7RXxxd0Dfe925iP04cmKfhZjcFzV2NNZwolffMY2o=" crossorigin="anonymous"></script>
+		<script async src="https://cdnjs.cloudflare.com/ajax/libs/canvg/1.5/canvg.js" type="text/javascript" integrity="sha256-gS9x7L+zPeuIJQi5Ozx6nkmnAKegHZGdx/Zy/jOs/Ao=" crossorigin="anonymous"></script>
 		
-		<!-- Own scripts -->
-		<script src="src/js/emojibuilder.js" type="text/javascript"></script> 
-        
+		<!-- Styles -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" integrity="sha384-1/c3t1iXE/jjONQVSIu3dJLQJtpSUkR1ve1UqMCC9YLr57ep4khd1BdU+YRhyTnB" crossorigin="anonymous" />
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
 		<!-- Favicon -->
 		<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -35,37 +64,57 @@
 	
 	<body>
 		<div class="wrapper">
-			
-			<div class="info collapsed" role="contentinfo">EmojiBuilder by <a href="https://twitter.com/fdebijl" title="Author's Twitter account">@fdebijl</a>
-				This site is currently in <b>beta</b>.
-                For more info, or to help me out finish this site, visit the <a href="https://github.com/fdebijl/emojibuilder" title="GitHub for EmojiBuilder">GitHub page</a>.
-				
-				<b>Controls:</b>
-				Click any emoji on the right or drag them in to start editing.
-				You can select any path by clicking on it once. To deselect a path, click anywhere on the drawboard.
-				To delete a path, press 'Delete' on your keyboard or click the garbage bin icon in the lower left.
-			
-				To hide this pop-up, click anywhere on it.</div>
-			
-			<div class="modal" role="dialog">
-				<img src="img/oval.svg" alt="Loading icon" aria-hidden="true">
-				<span>Reticulating splines...</span>
-			</div>
-			
-			<div class="controls">
-				<div class="group">
-					<i class="clear">	<span class="tooltip">Clear all emoji from the canvas.</span></i>
-					<i class="download"><span class="tooltip">Download the emoji as PNG</span></i>
+
+			<nav class="uk-navbar-container menubar" uk-navbar="mode: click;">
+				<div class="uk-navbar-left">
+					<a href="" class="uk-navbar-item uk-logo">
+						<img class="nav-logo" src="img/logo.svg" alt="The logo of Emojibuilder">
+					</a>
+					<ul class="uk-navbar-nav">
+						<li>
+							<a href="#">File</a>
+							<div class="uk-navbar-dropdown">
+								<ul class="uk-nav uk-navbar-dropdown-nav">
+									<li><a class="clear" href="#">New...</a></li>
+									<li><a class="open" href="#">Open...</a></li>
+									<li><a class="saveas" href="#">Save As...</a></li>
+								</ul>
+							</div>
+						</li>
+						<li>
+							<a href="#">Edit</a>
+							<div class="uk-navbar-dropdown">
+								<ul class="uk-nav uk-navbar-dropdown-nav">
+									<li><a class="delete" href="#">Delete path</a></li>
+									<li><a class="forward" href="#">Bring path forwards</a></li>
+									<li><a class="backward" href="#">Push path backwards</a></li>
+								</ul>
+							</div>
+						</li>
+						<li>
+							<a href="#">About</a>
+							<div class="uk-navbar-dropdown">
+								<ul class="uk-nav uk-navbar-dropdown-nav">
+									<li><a class="help" href="#">Help</a></li>
+									<li><a href="https://github.com/fdebijl/emojibuilder" target="_blank">GitHub</a></li>
+									<li><a href="https://twitter.com/fdebijl" target="_blank">Author Twitter</a></li>
+								</ul>
+							</div>
+						</li>
+					</ul>
 				</div>
-				<div class="group">
-					<i class="delete">	<span class="tooltip">Delete the currently selected path</span></i>
-					<i class="forward">	<span class="tooltip">Bring the currently selected layer forward</span></i>
-					<i class="backward"><span class="tooltip">Push the currently selected layer backward</span></i>
-				</div>
-			</div>
-			
-			<div id="drawboard" ondrop="appendEmoji(event)" ondragover="allowDrop(event)">
+			</nav>
+						
+			<div id="drawboard">
 				<span class="hinter">Drop emoji from the right on here</span>
+			</div>
+
+			<div class="inline-controls">
+				<div class="group">
+					<i class="delete" uk-tooltip="title: Delete the currently selected path; pos: right; delay: 333;"></i>
+					<i class="forward" uk-tooltip="title: Bring the currently selected layer forward; pos: right; delay: 333;"></i>
+					<i class="backward" uk-tooltip="title: Push the currently selected layer backward; pos: right; delay: 333;"></i>
+				</div>
 			</div>
 			
 			<aside class="sidebar">
@@ -75,6 +124,63 @@
                 <section class="emojigrid"></section>
 				
 			</aside>
+
+			<section class="modals">
+				<div id="save-modal" uk-modal role="dialog">
+					<div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+						<div class="uk-modal-header">
+							<h2 class="uk-modal-title">What do you need?</h2>
+						</div>
+						<div class="download-png uk-card uk-card-default uk-card-hover uk-modal-close">
+							<h3>I want a file I can share (PNG)</h3>
+							Save the emoji as an image that you can post anywhere.
+						</div>
+						<div class="download-svg uk-card uk-card-default uk-card-hover uk-modal-close">
+							<h3>I want to edit this emoji later on (SVG)</h3>
+							Save the emoji as an SVG-file that you can edit anytime by coming back here and selecting 'File > Open'.
+							<br><br>
+							<i>Note: this isn't real SVG, so please dont try to open it in your browser. Unless it's only one emoji, in which case it will work fine.</i>
+						</div>
+						<div class="uk-modal-footer uk-text-right">
+								<button class="uk-modal-close uk-button uk-button-primary" type="button">Nevermind</button>
+						</div>
+					</div>
+				</div>
+
+				<div id="loading-modal" uk-modal role="dialog">
+					<img src="img/oval.svg" alt="Loading icon" aria-hidden="true">
+					<span>Reticulating splines...</span>
+				</div>
+
+				<div id="info-modal" uk-modal role="dialog">
+					<div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+						<h2 class="uk-modal-title">EmojiBuilder by <a href="https://twitter.com/fdebijl" title="Author's Twitter account" target="_blank">@fdebijl</a></h2>
+						<p>For more info, or to help me out finish this site, visit the <a href="https://github.com/fdebijl/emojibuilder" title="GitHub for EmojiBuilder" target="_blank">GitHub page</a>.
+							
+							<b>Instructions:</b>
+							Click any emoji on the right or drag them onto the drawboard to start editing.
+							You can select any path by clicking on it once. To deselect a path, click anywhere else on the drawboard. Or on a different path to select that one.
+							To delete a path, press 'Delete' on your keyboard or select 'Edit > Delete path'
+
+							To save your creation as an image file (.png) to share with other, select 'File > Save As... > PNG'.
+							If you want to save an emoji for later editing, you may select SVG in the same dialog.
+							In order to open the saved SVG file, select 'File > Open...' and open your SVG file.
+							To delete the current emoji, select 'File > New'.
+						
+							To hide this pop-up and start editing, click the button below.</p>
+						<button class="uk-modal-close uk-button uk-button-default" type="button">Close</button>
+					</div>
+				</div>
+
+				<!-- Lets hope no one has to see this one -->
+				<div id="fatal-modal" uk-modal role="dialog">
+					<div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+						<h2 class="uk-modal-title">Error: a Security Policy Violation occured</h2>
+						<p>Emojibuilder could not be loaded because one of the files needed to function is malformed and can not be downloaded. The developer has been notified, but you may open an issue on <a id="csp-issue-link" href="" title="GitHub for EmojiBuilder">GitHub</a> if the problem persists.</p>
+						<button class="uk-modal-close uk-button uk-button-default" type="button">Close</button>
+					</div>
+				</div>
+			</section>
 			
 		</div>
 	</body>
