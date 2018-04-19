@@ -22,7 +22,7 @@ $(window).on('securitypolicyviolation', function(event) {
 		let issuelink = `https://github.com/Fdebijl/EmojiBuilder/issues/new?title=CSP%20Violation&body=${encodeURI(JSON.stringify(pevt, null, 4))}`
 		$('#csp-issue-link').attr('href', issuelink);
 
-		ShowModal("fatal-modal");
+		ShowModal("fatal-modal", 30);
 	});
 });
 
@@ -44,18 +44,11 @@ $(document).ready(function() {
 	const svgdir = "svg/";
     getSVG(svgdir);
 	
-	// Remove the hint from DOM after 15 seconds by fading it out and removing it upon animation completion
+	// Remove the hint from the drawboard after 15 seconds by fading it out and removing it upon animation completion
 	setTimeout(function() {
-		$('.hinter').fadeOut("slow", function() {
-			$(this).remove();
-		});
+		$('.hinting').removeClass('hinting');
 	}, 15 * 1000);
 	
-	// Remove selection when clicking anywhere on the drawboard
-	$('#drawboard').click(function(evt) {
-		$('path').removeClass('selected');
-	});
-
 	// Remove superfluous elements
 	$('.ui-loader').remove();
 
@@ -66,49 +59,59 @@ $(document).ready(function() {
 function ControlsAndMenu() {
 	// File
 		// New file
-		$('.clear').click(function(evt){
+		$('.clear').on('vclick', function(evt){
 			$('#drawboard').empty();
 		});
 
-		$('.open').click(function(evt){
+		$('.open').on('vclick', function(evt){
 			LoadSVG();
 		});
 
-		$('.saveas').click(function(evt){
+		$('.saveas').on('vclick', function(evt){
 			ShowModal("save-modal", 0);
 		});
 
 	// Edit
 		// Delete selected path
-		$('.delete').click(function(e) {
+		$('.delete').on('vclick', function(e) {
 			$('.selected').remove();
 		});
 		
 		// Bring forwards
-		$('.forward').click(function(e){
+		$('.forward').on('vclick', function(e){
 			$('.selected').parent().insertAfter($('.selected').parent().next()); 
 			
 		});
 		
 		// Push backwards
-		$('.backward').click(function(e){
+		$('.backward').on('vclick', function(e){
 			$('.selected').parent().insertBefore($('.selected').parent().prev()); 
 		});
 
-	
+		// Transform
+			// Flip horizontal
+			$('.fliphorizontal').on('vclick', function(e){
+				$('.selected').parent().insertBefore($('.selected').parent().prev()); 
+			});
+
+			// Flip vertical
+			$('.flipvertical').on('vclick', function(e){
+				$('.selected').parent().insertBefore($('.selected').parent().prev()); 
+			});
+
 	// About
 		// Help
-		$('.help').click(function(evt){
+		$('.help').on('vclick', function(evt){
 			ShowModal("info-modal", 0);
 		});
 
 	// Render the canvas and save as png when the "Save as PNG" button is clicked
-	$('.download-png').click(function(evt) {
+	$('.download-png').on('vclick', function(evt) {
 		SaveAsPNG();
 	});
 
 	// Same for SVG
-	$('.download-svg').click(function(evt) {
+	$('.download-svg').on('vclick', function(evt) {
 		SaveAsSVG();
 	});
 }

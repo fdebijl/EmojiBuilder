@@ -9,6 +9,8 @@
 		<meta http-equiv="Content-Security-Policy" content="
 			default-src 'none'; 
 			require-sri-for script;
+			manifest-src 
+				'self';
 			font-src
 				https://fonts.gstatic.com;
 			connect-src
@@ -29,7 +31,8 @@
 				'sha256-z0ybUvK00h8AqV0PKBU381T4kbU/nfbEQ5wJOi5jGvk=' 
 				'sha256-Ti7RXxxd0Dfe925iP04cmKfhZjcFzV2NNZwolffMY2o=' 
 				'sha256-gS9x7L+zPeuIJQi5Ozx6nkmnAKegHZGdx/Zy/jOs/Ao='
-				'sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=';
+				'sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=' 
+				'sha256-ygOvSgNXVQ3nXNfd5lsn+a6k4THX1tW24aOwm6qMCxI=';
 		">
 
 		<title>Emojibuilder</title>
@@ -42,10 +45,11 @@
 		<script src="js/emojibuilder.js"></script>
 
 		<script async src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js" integrity="sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=" crossorigin="anonymous"></script>
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.js" type="text/javascript" integrity="sha256-E3NHJIUaclYHEQ6uRnkvD72rAmbJYVJ92sCOU/0Rd7s=" crossorigin="anonymous"></script>
+		<script async src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.js" type="text/javascript" integrity="sha256-E3NHJIUaclYHEQ6uRnkvD72rAmbJYVJ92sCOU/0Rd7s=" crossorigin="anonymous"></script>
 		<script async src="https://canvg.github.io/canvg/rgbcolor.js" type="text/javascript" integrity="sha256-z0ybUvK00h8AqV0PKBU381T4kbU/nfbEQ5wJOi5jGvk=" crossorigin="anonymous"></script> 
 		<script async src="https://canvg.github.io/canvg/StackBlur.js" type="text/javascript" integrity="sha256-Ti7RXxxd0Dfe925iP04cmKfhZjcFzV2NNZwolffMY2o=" crossorigin="anonymous"></script>
 		<script async src="https://cdnjs.cloudflare.com/ajax/libs/canvg/1.5/canvg.js" type="text/javascript" integrity="sha256-gS9x7L+zPeuIJQi5Ozx6nkmnAKegHZGdx/Zy/jOs/Ao=" crossorigin="anonymous"></script>
+		<script async src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit-icons.min.js" integrity="sha256-ygOvSgNXVQ3nXNfd5lsn+a6k4THX1tW24aOwm6qMCxI=" crossorigin="anonymous"></script>
 		
 		<!-- Styles -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" integrity="sha384-1/c3t1iXE/jjONQVSIu3dJLQJtpSUkR1ve1UqMCC9YLr57ep4khd1BdU+YRhyTnB" crossorigin="anonymous" />
@@ -88,6 +92,18 @@
 									<li><a class="delete" href="#">Delete path</a></li>
 									<li><a class="forward" href="#">Bring path forwards</a></li>
 									<li><a class="backward" href="#">Push path backwards</a></li>
+									<li class="uk-nav-divider"></li>
+									<li>
+										<a>Transform</a>
+										<div class="uk-navbar-dropdown" uk-dropdown="pos: right-center; mode: click; offset: 10;">
+											<ul class="uk-nav uk-navbar-dropdown-nav">
+												<li><a class="fliphorizontal" href="#">Flip horizontal</a></li>
+												<li><a class="flipvertical" href="#">Flip vertical</a></li>
+												<li><a class="rotate90cw" href="#">Rotate 90° clockwise</a></li>
+												<li><a class="rotate90ccw" href="#">Rotate 90° counter-clockwise</a></li>
+											</ul>
+										</div>
+									</li>
 								</ul>
 							</div>
 						</li>
@@ -104,26 +120,28 @@
 					</ul>
 				</div>
 			</nav>
-						
-			<div id="drawboard">
-				<span class="hinter">Drop emoji from the right on here</span>
-			</div>
-
-			<div class="inline-controls">
-				<div class="group">
-					<i class="delete" uk-tooltip="title: Delete the currently selected path; pos: right; delay: 333;"></i>
-					<i class="forward" uk-tooltip="title: Bring the currently selected layer forward; pos: right; delay: 333;"></i>
-					<i class="backward" uk-tooltip="title: Push the currently selected layer backward; pos: right; delay: 333;"></i>
-				</div>
-			</div>
 			
-			<aside class="sidebar">
-                
-                <nav class="tabs"><div class="tab tabheader">Categories:</div></nav>
-                
-                <section class="emojigrid"></section>
+			<section class="content">
+				<div class="inline-controls">
+					<div class="group">
+						<i class="delete" uk-tooltip="title: Delete the currently selected path; pos: right; delay: 333;"></i>
+						<i class="forward" uk-tooltip="title: Bring the currently selected layer forward; pos: right; delay: 333;"></i>
+						<i class="backward" uk-tooltip="title: Push the currently selected layer backward; pos: right; delay: 333;"></i>
+					</div>
+				</div>
+
+				<div class="scrollhandle"></div>
+
+				<div id="drawboard" class="hinting"></div>
 				
-			</aside>
+				<aside class="sidebar">
+					
+					<nav class="tabs"><div class="tab tabheader">Categories:</div></nav>
+					
+					<section class="emojigrid"></section>
+					
+				</aside>
+			</section>
 
 			<section class="modals">
 				<div id="save-modal" uk-modal role="dialog">
