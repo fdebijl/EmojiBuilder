@@ -1,3 +1,6 @@
+(function() {
+"use strict";
+
 // Let the user know they need to let me known one of the SHA256 digests has become invalid, most likely because of an update to Canvg
 $(window).on('securitypolicyviolation', function(event) {
 	let oevt = event.original;
@@ -27,7 +30,7 @@ $(window).on('securitypolicyviolation', function(event) {
 	});
 });
 
-$(document).ready(function() {
+$(window).on("load", function() {
 	// The CSP prevents inline event binding, so we bind the drag-and-drop listeners here
 	document.getElementById('drawboard').addEventListener('drop', function(event) {
 		event.preventDefault();  
@@ -69,12 +72,12 @@ $(document).ready(function() {
 			$('.cachesize').html(`${Math.round(estimate.usage / 1000 / 1000 * 100) / 100}MB`);
 		});
 
-		$('.persist').on('vclick', function(evt){
+		$('.persist').on('click touch', function(evt){
 			ShowModal("persist-modal", 0);
 		});
 
 		// Persistent storage permissions have been granted
-		$('.persist-granted').on('vclick', function(evt){
+		$('.persist-granted').on('click touch', function(evt){
 			navigator.storage.persist().then(granted => {
 				console.info("Persistent storage permissisons granted.")
 			})
@@ -86,59 +89,59 @@ $(document).ready(function() {
 function ControlsAndMenu() {
 	// File
 		// New file
-		$('.clear').on('vclick', function(evt){
+		$('.clear').on('click touch', function(evt){
 			$('#drawboard').empty();
 		});
 
-		$('.open').on('vclick', function(evt){
+		$('.open').on('click touch', function(evt){
 			LoadSVG();
 		});
 
-		$('.saveas').on('vclick', function(evt){
+		$('.saveas').on('click touch', function(evt){
 			ShowModal("save-modal", 0);
 		});
 
 	// Edit
 		// Delete selected path
-		$('.delete').on('vclick', function(e) {
+		$('.delete').on('click touch', function(e) {
 			$('.selected').remove();
 		});
 		
 		// Bring forwards
-		$('.forward').on('vclick', function(e){
+		$('.forward').on('click touch', function(e){
 			$('.selected').parent().insertAfter($('.selected').parent().next()); 
 			
 		});
 		
 		// Push backwards
-		$('.backward').on('vclick', function(e){
+		$('.backward').on('click touch', function(e){
 			$('.selected').parent().insertBefore($('.selected').parent().prev()); 
 		});
 
 		// Transform
 			// Flip horizontal
-			$('.fliphorizontal').on('vclick', function(e){
+			$('.fliphorizontal').on('click touch', function(e){
 				$('.selected').parent().insertBefore($('.selected').parent().prev()); 
 			});
 
 			// Flip vertical
-			$('.flipvertical').on('vclick', function(e){
+			$('.flipvertical').on('click touch', function(e){
 				$('.selected').parent().insertBefore($('.selected').parent().prev()); 
 			});
 
 	// About
 		// Help
-		$('.help').on('vclick', function(evt){
+		$('.help').on('click touch', function(evt){
 			ShowModal("info-modal", 0);
 		});
 
 	// Render the canvas and save as png when the "Save as PNG" button is clicked
-	$('.download-png').on('vclick', function(evt) {
+	$('.download-png').on('click touch', function(evt) {
 		SaveAsPNG();
 	});
 
 	// Same for SVG
-	$('.download-svg').on('vclick', function(evt) {
+	$('.download-svg').on('click touch', function(evt) {
 		SaveAsSVG();
 	});
 }
@@ -187,23 +190,23 @@ function Draggable(elem) {
     let clickPoint  = target.ownerSVGElement.createSVGPoint();
     let currentMove = target.ownerSVGElement.createSVGPoint();
 	
-	$(target).on("vmousedown", function(evt) {
+	$(target).on("pointerdown", function(evt) {
         evt.preventDefault();
         clickPoint = globalToLocalCoords(evt.clientX, evt.clientY);
         $(target).addClass("dragged");
-        $(target.ownerSVGElement).on("vmousemove", target, function(evt) {
+        $(target.ownerSVGElement).on("pointermove", target, function(evt) {
 			let p = globalToLocalCoords(evt.clientX, evt.clientY);
 			currentMove.x = lastMove.x + (p.x - clickPoint.x);
 			currentMove.y = lastMove.y + (p.y - clickPoint.y);
-			target.setAttribute("transform", "translate(" + currentMove.x + "," + currentMove.y + ")");
+			ApplyTransform(target, "translate", currentMove.x + "," + currentMove.y);
 		});
 		
-        $(target.ownerSVGElement).on("vmouseup", target, function(evt) {
+        $(target.ownerSVGElement).on("pointerup", target, function(evt) {
 			lastMove.x = currentMove.x;
 			lastMove.y = currentMove.y;
 			$(target).removeClass("dragged");
-			$(target.ownerSVGElement).off("vmousemove");
-			$(target.ownerSVGElement).off("vmouseup");
+			$(target.ownerSVGElement).off("pointermove");
+			$(target.ownerSVGElement).off("pointerup");
 		});
     });
 	
@@ -227,13 +230,13 @@ function getSVGFilesInDirectory(directory) {
         let d = data;
         
 		// Iterate over directories
-        for (i = 0; i < d.length; i++) {
+        for (let i = 0; i < d.length; i++) {
             // Append current category (d[i].name) to emojigrid and tabmenu
             $(".emojigrid").append('<div class="grid grid_' + d[i].name + '"></div>');
             $(".tabs").append('<div class="tab tab_' + d[i].name + '" data-cat="' + d[i].name + '">' + capitalizeFirstLetter(d[i].name) + '</div>');
             
 			// Iterate over files in directory d[i]
-            for (j = 0; j < d[i].dir.length; j++) {
+            for (let j = 0; j < d[i].dir.length; j++) {
                 // Root = "svg/"
                 // d[1].name = faces/objects/etc
                 // d[i].dir[i].file = filename
@@ -431,7 +434,7 @@ function makePathsDraggable() {
 		new Draggable(this);
 		
 		// Make each path selectable by click
-		$(this).on("vclick", function(evt) {
+		$(this).on("click touch", function(evt) {
 			$('path').removeClass('selected');
 			$(evt.target).addClass('selected');
 		});
@@ -439,9 +442,46 @@ function makePathsDraggable() {
 	});
 }
 
+// Apply a transformation to an SVG path without destroying/unsetting the current transformations
+function ApplyTransform(path, name, value) {
+	// All parameters are required
+	if (!path || !name || !value) {
+		throw new Error(`Attempted to apply transformation to path with missing arguments:${path?"":" path"}${name?"" :" name"} ${value?"":" value"}`)
+		return;
+	}
+
+	// Ensure naming consistency with the spec
+	name = name.toLowerCase();
+
+	let transforms = $(path).attr('transform');
+	// If no transformation is applied to this element we will continue with an empty array. The new transformation will be pushed to this array later on.
+	transforms =  transforms ? transforms.split(" ") : [];
+
+	// Transforms all have the signature 'name(value)', so we can retrieve the name by getting every char ahead of the first parenthesis
+	let targettransformindex = transforms.findIndex(transform => transform.split("(")[0] === name);
+
+	// If targettransformindex is greater than or equal to 0, the target path already has a value for the desired transformation. We'll mutate that value right here.
+	if (targettransformindex >= 0) {
+		transforms[targettransformindex] = transforms[targettransformindex].replace(/\((.+?)\)/g, `(${value})`);
+	} else {
+		// If targettransformindex is -1, we need to create the transformation ourselves and append it to the attribute.
+		transforms.push(`${name}(${value})`);
+	}
+
+	$(path).attr('transform', transforms.join(" "));
+}
+
+// A hack to make translates not be affected by rotation
+function RotationEnabled(path, enabled) {
+
+}
+
+window.ApplyTransform = ApplyTransform;
+
 // Listen for delete keypress and delete the currently selected path
 $('html').keyup(function(evt) {
     if (evt.keyCode == 46) {
         $('.selected').remove();
     }
 });
+})();
