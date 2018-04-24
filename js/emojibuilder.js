@@ -1,6 +1,6 @@
 // Let the user know they need to let me known one of the SHA256 digests has become invalid, most likely because of an update to Canvg
 $(window).on('securitypolicyviolation', function(event) {
-	let oevt = event.originalEvent;
+	let oevt = event.original;
 	let pevt = {
 		time: Date.now(),
 		uri: oevt.blockedURI,
@@ -152,7 +152,7 @@ function allowDrop(evt) {
 // appendEmoji is used when an element is dropped onto the drawboard.
 // Translate dropped imgs to function call on addSVG()
 function appendEmoji(evt) {
-	addSVGtoDrawboard(document.getElementById(evt.dataTransfer.getData("text/html")), evt.clientX, evt.clientY);
+	addSVGtoDrawboard(document.getElementById(evt.dataTransfer.getData("text/html")));
 }
 
 // Pass the source element when dragging images so appendEmoji() can parse them onto the drawboard
@@ -272,7 +272,7 @@ function addSVGtoDrawboard(elem) {
 	let stager = '<div class="stagingarea" style="display: none;"></div>';
 	$('.wrapper').append($.parseHTML(stager));
 	
-	// Clear the hinter - the user obviously figured out how to drag already
+	// Clear the hinter - the user figured out how to add emoji to the drawboard at this point
 	$('.hinter').remove();
 	
 	// Append the SVG file to the staging area and subsequently move to the drawboard
@@ -280,7 +280,8 @@ function addSVGtoDrawboard(elem) {
 		// Aaaaand move it to the drawboard
 		$('#drawboard').append($('.stagingarea').html());
 
-		// Remove all clipping paths that prevent SVG movement outside of the bounding box. Also metadata because there's really no good reason to have it in here for our purposes.
+		// Remove all clipping paths (i.e. masks) that prevent SVG movement outside of the bounding box. 
+		// All metadata tags are also stripped because there's really no good reason to have it in here for our purposes.
 		$('defs').remove();
 		$('metadata').remove();
 		
@@ -314,7 +315,7 @@ function SaveAsPNG() {
 	// Show loading overlay
 	UIkit.modal(document.getElementById('loading-modal')).show();
 			
-	// Make a temporary canvas to dump all the SVG to and append it to DOM
+	// Make a temporary canvas to dump all the SVG to and append it to the DOM
 	let renderbox = '<canvas id="renderbox"></canvas>';
 	$('.wrapper').append($.parseHTML(renderbox));
 
@@ -379,7 +380,9 @@ function SaveAsPNG() {
 
 // Save the drawboard to an SVG file the user can come back to edit later on
 function SaveAsSVG() {
-	// This is a lot easier than PNG
+	// This is a lot easier than PNG since we can just dump the entire contents of the drawboard to a file.
+	// Note that this will only produce a valid SVG file if the user has added just one emoji to the drawboard.
+	// Our custom loader will work just fine with more than one emoji.
 	let url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent($('#drawboard').html());
 	let DownloadHelper = document.createElement('a');
 	DownloadHelper.href = url;

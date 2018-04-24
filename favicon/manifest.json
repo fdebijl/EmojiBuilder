@@ -1,5 +1,6 @@
 {
-    "name": "Emojibuilder",
+    "name": "Emojibuilder - Construct your own emoji/abominations",
+    "short_name": "Emojibuilder",
     "icons": [
         {
             "src": "android-chrome-192x192.png",
@@ -13,5 +14,7 @@
         }
     ],
     "theme_color": "#2d2d2d",
-    "background_color": "#2d2d2d"
+    "background_color": "#2d2d2d",
+    "start_url": "index.html",
+    "display": "standalone"
 }
