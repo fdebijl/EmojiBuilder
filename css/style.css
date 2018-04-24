@@ -159,7 +159,7 @@ g {
     display: flex !important;
 }
 
-#info-modal {
+#info-modal, #persist-modal p {
     white-space: pre-line;
 }
 
@@ -222,7 +222,7 @@ g {
 .grid {
 	display: none;
 	overflow-y: scroll;
-    width: 20vw;
+    width: 100%;
 	height: 80vh;
 }
 
@@ -275,6 +275,12 @@ g {
     width: 25px;
 }
 
+.disabled {
+    pointer-events: none;
+    color: #999 !important;
+    cursor: not-allowed;
+}
+
 /* SVG-specific styles
 ===================================================== */ 
 
@@ -301,7 +307,7 @@ g {
 /* Mobile styles
 ===================================================== */ 
 
-@media only screen and (max-device-width: 850px) {
+@media only screen and (max-width: 850px) {
     .sidebar {
         bottom: unset;
         top: 0;
@@ -310,7 +316,7 @@ g {
     }
 }
 
-@media only screen and (max-device-width: 500px) {
+@media only screen and (max-width: 500px) {
 	.content {
 		flex-flow: column nowrap;
 	}

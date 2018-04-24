@@ -13,6 +13,7 @@ $(window).on('securitypolicyviolation', function(event) {
 		sample: oevt.sample
 	};
 
+	// Since the user might not be able to create an issue, we also send a report to our own servers
 	$.ajax({
 		url: "https://floris.amsterdam/reports/csp",
 		method: "POST",
@@ -42,9 +43,9 @@ $(document).ready(function() {
 
     // Start by populating the emojigrid
 	const svgdir = "svg/";
-    getSVG(svgdir);
+    getSVGFilesInDirectory(svgdir);
 	
-	// Remove the hint from the drawboard after 15 seconds by fading it out and removing it upon animation completion
+	// Remove the hint from the drawboard after 15 seconds
 	setTimeout(function() {
 		$('.hinting').removeClass('hinting');
 	}, 15 * 1000);
@@ -53,6 +54,32 @@ $(document).ready(function() {
 	$('.ui-loader').remove();
 
 	ControlsAndMenu();
+
+	// Register the serviceworker used to cache all resources
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('/test/emojiworker.js');
+	}
+
+	// Check for availability of the persistent storage API
+	if (navigator.storage && navigator.storage.persist) {
+		$('.persist').removeClass('disabled');
+
+		// Get usage in MB so the user can decide if the space is worth it
+		navigator.storage.estimate().then(estimate => {
+			$('.cachesize').html(`${Math.round(estimate.usage / 1000 / 1000 * 100) / 100}MB`);
+		});
+
+		$('.persist').on('vclick', function(evt){
+			ShowModal("persist-modal", 0);
+		});
+
+		// Persistent storage permissions have been granted
+		$('.persist-granted').on('vclick', function(evt){
+			navigator.storage.persist().then(granted => {
+				console.info("Persistent storage permissisons granted.")
+			})
+		});
+	};
 });
 
 // Enable functionality on menubar and other controls
@@ -125,7 +152,7 @@ function allowDrop(evt) {
 // appendEmoji is used when an element is dropped onto the drawboard.
 // Translate dropped imgs to function call on addSVG()
 function appendEmoji(evt) {
-	addSVG(document.getElementById(evt.dataTransfer.getData("text/html")), evt.clientX, evt.clientY);
+	addSVGtoDrawboard(document.getElementById(evt.dataTransfer.getData("text/html")), evt.clientX, evt.clientY);
 }
 
 // Pass the source element when dragging images so appendEmoji() can parse them onto the drawboard
@@ -190,8 +217,8 @@ function Draggable(elem) {
 	}
 }
 
-// Retrieve all files from a given directory
-function getSVG(directory) {
+// Retrieve all SVG files from a given directory
+function getSVGFilesInDirectory(directory) {
     $.ajax({
         url: "svgs.json",
     })
@@ -222,7 +249,7 @@ function getSVG(directory) {
 		
 		// Bind addSVG to each img to allow click-to-add to the drawboard
         $('.svg-icon').click(function(e) {
-            addSVG(this); 
+            addSVGtoDrawboard(this); 
 		});
 		
 		// Once again we need to attach the drag-and-drop event handler inline to prevent CSP violations
@@ -240,7 +267,7 @@ function getSVG(directory) {
 }
 
 // Add this SVG element to the drawboard
-function addSVG(elem) {
+function addSVGtoDrawboard(elem) {
 	// Append staging area to DOM to load SVG in. $.load is destructive so we need a proxy element to prevent clearing the drawboard
 	let stager = '<div class="stagingarea" style="display: none;"></div>';
 	$('.wrapper').append($.parseHTML(stager));
@@ -261,7 +288,7 @@ function addSVG(elem) {
 		$('.stagingarea').remove();
 		
 		// Done, let's make it draggable
-		PathsAsDraggable();
+		makePathsDraggable();
 	}); 
 }
 
@@ -280,7 +307,7 @@ function addSVGstring(svgstring) {
 	$('metadata').remove();
 	$('.stagingarea').remove();
 
-	PathsAsDraggable();
+	makePathsDraggable();
 }
 
 function SaveAsPNG() {
@@ -350,6 +377,7 @@ function SaveAsPNG() {
 	);	
 }	
 
+// Save the drawboard to an SVG file the user can come back to edit later on
 function SaveAsSVG() {
 	// This is a lot easier than PNG
 	let url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent($('#drawboard').html());
@@ -360,6 +388,7 @@ function SaveAsSVG() {
 	$(DownloadHelper).remove();
 }
 
+// Load an SVG file and display it to the drawboard
 function LoadSVG() {
 	let input = $(document.createElement("input"));
 	input.attr("type", "file");
@@ -369,6 +398,7 @@ function LoadSVG() {
 
 		reader.onload = (function(resultfile) {
 			return function(e) {
+				// Append the contents of the SVG file to the drawboard
 				addSVGstring(e.target.result);
 			};
 		})(file);
@@ -380,6 +410,7 @@ function LoadSVG() {
 	return false;
 }
 
+// Show a modal for a specified period of time. Defaults to displaying the modal for 10 seconds.
 function ShowModal(modalname, delay = 10) {
 	if (delay > 0 ) {
 		UIkit.modal(document.getElementById(modalname)).show();
@@ -391,8 +422,9 @@ function ShowModal(modalname, delay = 10) {
 	}
 }
 
-function PathsAsDraggable() {
+function makePathsDraggable() {
 	$('path').each(function() {
+		// Instantiate Draggable on this element
 		new Draggable(this);
 		
 		// Make each path selectable by click

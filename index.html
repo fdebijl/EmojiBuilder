@@ -82,6 +82,8 @@
 									<li><a class="clear" href="#">New...</a></li>
 									<li><a class="open" href="#">Open...</a></li>
 									<li><a class="saveas" href="#">Save As...</a></li>
+									<li class="uk-nav-divider"></li>
+									<li><a class="persist disabled" href="#">Available offline</a></li>
 								</ul>
 							</div>
 						</li>
@@ -187,6 +189,23 @@
 						
 							To hide this pop-up and start editing, click the button below.</p>
 						<button class="uk-modal-close uk-button uk-button-default" type="button">Close</button>
+					</div>
+				</div>
+
+				<div id="persist-modal" uk-modal role="dialog">
+					<div class="uk-modal-dialog uk-margin-auto-vertical">
+						<div class="uk-modal-header">
+							<h2 class="uk-modal-title">Make Emojibuilder available offline</h2>
+						</div>
+						<div class="uk-modal-body">
+							<p>Emojibuilder will always attempt to cache all emoji and files required to function, so  the site will load faster on your next visit and will even work offline. 
+		
+								Your browser may however clear this cache at any time, you can prevent this by granting persistent storage permission. This will maintain the cache (current size: <span class="cachesize">empty</span>) for your next visit.</p>
+						</div>
+						<div class="uk-modal-footer uk-text-right">
+							<button class="uk-modal-close uk-button uk-button-primary persist-granted" type="button">Grant permission</button>
+							<button class="uk-modal-close uk-button uk-button-default" type="button">Nevermind</button>
+						</div>
 					</div>
 				</div>
 
