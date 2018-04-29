@@ -1,29 +1,32 @@
 (function() {
 "use strict";
 
-// Let the user know they need to let me known one of the SHA256 digests has become invalid, most likely because of an update to Canvg
+// Allow access to the files from the SVGdir in all methods
+var svg_files;
+
+// Let the user know they need to let me known one of the SHA256 digests has become invalid
 $(window).on('securitypolicyviolation', function(event) {
-	let oevt = event.original;
-	let pevt = {
+	let originalEvent = event.original;
+	let parsedEvent = {
 		time: Date.now(),
-		uri: oevt.blockedURI,
-		docuri: oevt.documentURI,
-		disposition: oevt.disposition,
-		effectivedirective: oevt.effectiveDirective,
-		violateddirective: oevt.violatedDirective,
-		line: oevt.lineNumber,
-		referrer: oevt.referrer,
-		sample: oevt.sample
+		uri: originalEvent.blockedURI,
+		docuri: originalEvent.documentURI,
+		disposition: originalEvent.disposition,
+		effectivedirective: originalEvent.effectiveDirective,
+		violateddirective: originalEvent.violatedDirective,
+		line: originalEvent.lineNumber,
+		referrer: originalEvent.referrer,
+		sample: originalEvent.sample
 	};
 
 	// Since the user might not be able to create an issue, we also send a report to our own servers
 	$.ajax({
 		url: "https://floris.amsterdam/reports/csp",
 		method: "POST",
-		data: pevt
+		data: parsedEvent
 	})
 	.done(function(data) {
-		let issuelink = `https://github.com/Fdebijl/EmojiBuilder/issues/new?title=CSP%20Violation&body=${encodeURI(JSON.stringify(pevt, null, 4))}`
+		let issuelink = `https://github.com/Fdebijl/EmojiBuilder/issues/new?title=CSP%20Violation&body=${encodeURI(JSON.stringify(parsedEvent, null, 4))}`
 		$('#csp-issue-link').attr('href', issuelink);
 
 		ShowModal("fatal-modal", 30);
@@ -44,9 +47,19 @@ $(window).on("load", function() {
 		allowDrop(event);
 	});
 
-    // Start by populating the emojigrid
+	// The emoji in the sidebar will initially be hidden from view for mobile users, so we'll start loading those on the first scroll for them.
+	// For desktop clients we load only the first few rows of the 'faces' grid, since that one will be shown by default.
 	const svgdir = "svg/";
-    getSVGFilesInDirectory(svgdir);
+	getSVGFilesInDirectory(svgdir)
+		.then(files => { 
+			svg_files = files;
+			addTabs(files.tabs);
+			addGrids(files.grids);
+		})
+		.then(() => {
+			// Show the 'faces' grid by default
+			showGrid("faces");
+		});
 	
 	// Remove the hint from the drawboard after 15 seconds
 	setTimeout(function() {
@@ -56,6 +69,7 @@ $(window).on("load", function() {
 	// Remove superfluous elements
 	$('.ui-loader').remove();
 
+	// Bind all clickhandlers to the menus and on-screen contrls
 	ControlsAndMenu();
 
 	// Register the serviceworker used to cache all resources
@@ -168,8 +182,14 @@ function capitalizeFirstLetter(string) {
 }
 
 // Show the emojigrid for this tab (passed as category) in the sidebar
+// If the grid hasn't been shown previously we will also load the images here.
 function showGrid(cat) {
-	// Simple fadeout of the current active grid (ie: any grid) and callback to show the desired grid
+	if (!$('.grid_' + cat).hasClass('loaded')) {
+		addFilesToGrid(svg_files.grids[cat]);
+		$('.grid_' + cat).addClass('loaded');
+	}
+	
+	// Simple fadeout of the currently active grid and callback to show the desired grid
 	$('.grid').fadeOut(333, function() {
 		$('.grid_' + cat).show();
 		$('.tab').removeClass('tab_active');
@@ -220,39 +240,111 @@ function Draggable(elem) {
 	}
 }
 
-// Retrieve all SVG files from a given directory
-function getSVGFilesInDirectory(directory) {
-    $.ajax({
-        url: "svgs.json",
-    })
-    .done( function(data) {
-		let root = directory;
-        let d = data;
-        
-		// Iterate over directories
-        for (let i = 0; i < d.length; i++) {
-            // Append current category (d[i].name) to emojigrid and tabmenu
-            $(".emojigrid").append('<div class="grid grid_' + d[i].name + '"></div>');
-            $(".tabs").append('<div class="tab tab_' + d[i].name + '" data-cat="' + d[i].name + '">' + capitalizeFirstLetter(d[i].name) + '</div>');
-            
-			// Iterate over files in directory d[i]
-            for (let j = 0; j < d[i].dir.length; j++) {
-                // Root = "svg/"
-                // d[1].name = faces/objects/etc
-                // d[i].dir[i].file = filename
-                let filestring = '<img draggable="true" class="svg-icon" id="' + d[i].dir[j].file.split(".")[0] + '" src="' + root + d[i].name + "/" + d[i].dir[j].file + '">';				
-                $(".grid_" + d[i].name).append($.parseHTML(filestring));
+// Retrieve all SVG files from a given directory and return them as arrays
+async function getSVGFilesInDirectory(directory) {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			url: "svgs.json",
+		})
+		.done(function(data) {
+			let result = {
+				tabs: [],
+				grids: {}
 			}
-        }
-        
+			
+			// Iterate over directories inside the SVG folder. These are the categories.
+			for (let i = 0; i < data.length; i++) {
+				// Append current category (data[i].name) to the list emojigrids and tabmenus
+				result.grids[data[i].name] = {
+					html: '<div class="grid grid_' + data[i].name + '"></div>',
+					files: []
+				};
+
+				result.tabs.push('<div class="tab tab_' + data[i].name + '" data-cat="' + data[i].name + '">' + capitalizeFirstLetter(data[i].name) + '</div>')
+				
+				// Iterate over files in directory d[i]. There are the emoji themselves.
+				for (let j = 0; j < data[i].dir.length; j++) {
+					// Root = "svg/"
+					// d[1].name = The category. I.e. faces, objects, food, etc.
+					// d[i].dir[i].file = The filename of the emoji. E.g. 1f47d.svg
+					
+					let htmlstring = '<img draggable="true" class="svg-icon" id="' + data[i].dir[j].file.split(".")[0] + '" src="' + directory + data[i].name + "/" + data[i].dir[j].file + '">';
+					let targetgrid = '.grid_' + data[i].name;
+					result.grids[data[i].name].files.push({
+						grid: targetgrid,
+						html: htmlstring
+					});
+				}
+			}
+			resolve(result);
+		});
+	});
+}
+
+// Add tabs (i.e. categories) to the sidebar
+async function addTabs(tabs) {
+	return new Promise((resolve, reject) => {
+		// Asynchronously add every category to the tab menu
+		tabs.forEach((async (tab) => {
+			return new Promise((resolve, reject) => {
+				$(".tabs").append(tab);
+				resolve();
+			})
+		}));
+		
 		// Bind showGrid() to each tab to show the emojigrid for the corresponding category
 		$('.tabs > div').click(function(e) {
 			showGrid($(this).data('cat'));
 		});
-		
+
+		resolve();
+	});
+}
+
+// Add the grids to the sidebar
+// Grids will contain the individual emoji, every category has its own grid
+async function addGrids(grids) {
+	return new Promise((resolve, reject) => {
+		// Asynchronously add every category to the emojigrid
+		// We will later append the emoji themselves to these grids
+		Object.entries(grids).forEach((async (grid) => {
+			return new Promise((resolve, reject) => {
+				$(".emojigrid").append(grid[1].html);
+				resolve();
+			})
+		}));
+
+		resolve();
+	});
+}
+
+// Append all emoji to the given grid.
+// Expects an array with the following signature
+// [
+//		{
+//			grid: ".grid_faces",
+//			html: "<img draggable="true" class="svg-icon" id="1f47f" src="svg/faces/1f47f.svg">"
+//		},
+//		{
+//			grid: ".grid_faces",
+//			html: "<img draggable="true" class="svg-icon" id="1f600" src="svg/faces/1f600.svg">"
+//		}
+// ]
+async function addFilesToGrid(grid) {
+	return new Promise((resolve, reject) => {
+		// Asynchronously add every category to the emojigrid
+		// We will later append the emoji themselves to these grids
+		grid.files.forEach((async (emoji) => {
+			return new Promise((resolve, reject) => {
+				$(emoji.grid).append($.parseHTML(emoji.html));
+				resolve();
+			})
+		}));
+
+		// Bind showGrid() to each tab to show the emojigrid for the corresponding category
 		// Bind addSVG to each img to allow click-to-add to the drawboard
-        $('.svg-icon').click(function(e) {
-            addSVGtoDrawboard(this); 
+		$('.svg-icon').click(function(e) {
+			addSVGtoDrawboard(this); 
 		});
 		
 		// Once again we need to attach the drag-and-drop event handler inline to prevent CSP violations
@@ -264,9 +356,8 @@ function getSVGFilesInDirectory(directory) {
 			});
 		});
 
-		// Show the 'faces' grid by default
-		showGrid("faces");
-    });
+		resolve();
+	});
 }
 
 // Add this SVG element to the drawboard
