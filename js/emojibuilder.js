@@ -63,14 +63,12 @@ $(window).on("load", function() {
 			if (window.innerWidth <= 500) {
 				// Mobile layout
 				$(window).one('scroll touchmove', function(e){
-					// Show the 'faces' grid by default
 					showGrid("faces");
 				});
 			} else {
 				// Desktop
 				showGrid("faces");
 			}
-			
 		});
 	
 	// Remove the hint from the drawboard after 15 seconds
@@ -573,6 +571,9 @@ function ApplyTransform(path, name, value) {
 		// If targettransformindex is -1, we need to create the transformation ourselves and append it to the attribute.
 		transforms.push(`${name}(${value})`);
 	}
+
+	// Sort transforms alphabetically so transform is before rotate. If we didn't do this the element would translate from it's rotated origin, which is very counter-intuitive.
+	transforms = transforms.sort();
 
 	$(path).attr('transform', transforms.join(" "));
 }
