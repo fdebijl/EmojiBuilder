@@ -11,3 +11,10 @@ EmojiBuilder is currently very much in beta, check out the [roadmap project](htt
 ## Contributing:
 
 If you have a stellar idea to implement one of the above functions, go ahead and put in a pull request or issue with your suggestion! I dont really adhere to any particular standard, but try to follow best JS practices and some degree of commenting in your code.
+
+Build your local copy by downloading or cloning the repo and doing the following:  
+```SH
+npm install --only=dev
+gulp
+```
+Make sure you have both NPM and Yarn installed.
