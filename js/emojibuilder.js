@@ -80,11 +80,11 @@ $(window).on("load", function() {
 			if (window.innerWidth <= 500) {
 				// Mobile layout
 				$(window).one('scroll touchmove', function(e){
-					showGrid("faces");
+					showGrid("smileys");
 				});
 			} else {
 				// Desktop
-				showGrid("faces");
+				showGrid("smileys");
 			}
 		});
 	
@@ -303,23 +303,26 @@ async function getSVGFilesInDirectory() {
 			
 			// Iterate over directories inside the SVG folder. These are the categories.
 			for (let i = 0; i < data.length; i++) {
-				// Append current category (data[i].name) to the list emojigrids and tabmenus
-				result.grids[data[i].name] = {
-					html: '<div class="grid grid_' + data[i].name + '"></div>',
+				// Two versions of the gridname: one for scripts and one for displaying in the UI
+				let gridname = data[i].name.replace(" ", "-");
+				let humanname = capitalizeFirstLetter(data[i].name);
+				// Append current category (gridname) to the list emojigrids and tabmenus
+				result.grids[gridname] = {
+					html: '<div class="grid grid_' + gridname + '"></div>',
 					files: []
 				};
 
-				result.tabs.push('<div class="tab tab_' + data[i].name + '" data-cat="' + data[i].name + '">' + capitalizeFirstLetter(data[i].name) + '</div>')
+				result.tabs.push('<div class="tab tab_' + gridname + '" data-cat="' + gridname + '">' + humanname + '</div>')
 				
-				// Iterate over files in directory d[i]. There are the emoji themselves.
+				// Iterate over files in directory d[i]. These are the emoji themselves.
 				for (let j = 0; j < data[i].dir.length; j++) {
 					// Root = "svg/"
 					// d[1].name = The category. I.e. faces, objects, food, etc.
 					// d[i].dir[i].file = The filename of the emoji. E.g. 1f47d.svg
 					
 					let htmlstring = '<img draggable="true" class="svg-icon" id="' + data[i].dir[j].file.split(".")[0] + '" src="' + directory + data[i].name + "/" + data[i].dir[j].file + '">';
-					let targetgrid = '.grid_' + data[i].name;
-					result.grids[data[i].name].files.push({
+					let targetgrid = '.grid_' + gridname;
+					result.grids[gridname].files.push({
 						grid: targetgrid,
 						html: htmlstring
 					});
@@ -525,7 +528,7 @@ function SaveAsPNG() {
 function SaveAsSVG() {
 	// This is a lot easier than PNG since we can just dump the entire contents of the drawboard to a file.
 	// Note that this will only produce a valid SVG file if the user has added just one emoji to the drawboard.
-	// Our custom loader will work just fine with more than one emoji.
+	// Our custom loader will work just fine with more than one emoji, however.
 	let url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent($('#drawboard').html());
 	let DownloadHelper = document.createElement('a');
 	DownloadHelper.href = url;
