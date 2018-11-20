@@ -1,4 +1,4 @@
-const PAGE_ROOT = '/';
+const PAGE_ROOT = '.';
 const CACHE_NAME = 'emojicache';
 
 self.addEventListener('install', function(event) {

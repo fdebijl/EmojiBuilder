@@ -8,7 +8,7 @@ var svg_files;
 const URLS = Object.freeze({
 	CSP: "https://floris.amsterdam/reports/csp",
 	CSP_ISSUE: "https://github.com/Fdebijl/EmojiBuilder/issues/new?title=CSP%20Violation&body=",
-	WORKERPATH: "/test/emojiworker.js",
+	WORKERPATH: "/emojiworker.js",
 	SVG_DIR_PATH: "svg/"
 });
 
@@ -128,6 +128,12 @@ $(window).on("load", function() {
 
 // Enable functionality on menubar and other controls
 function ControlsAndMenu() {
+	// Buttons inside modals
+	$('.apply-scale').on('click touch', function(evt) {
+		ApplyTransform($('.selected'), TRANSFORMS.SCALE, $('#scale-input').val());
+	});
+
+	// Menu structure
 	// File
 		// New file
 		$('.clear').on('click touch', function(evt){
@@ -172,12 +178,12 @@ function ControlsAndMenu() {
 
 			// Rotate 90 clockwise
 			$('.rotate90cw').on('click touch', function(e){
-				ApplyTransform($('.selected'), "rotate", 90);
+				ApplyTransform($('.selected'), TRANSFORMS.ROTATE, 90);
 			});
 
 			// Rotate 90 counter-clockwise
 			$('.rotate90ccw').on('click touch', function(e){
-				ApplyTransform($('.selected'), "rotate", -90);
+				ApplyTransform($('.selected'), TRANSFORMS.ROTATE, -90);
 			});
 
 		// Rotate
@@ -187,7 +193,7 @@ function ControlsAndMenu() {
 
 		// Scale
 		$('.scale').on('click touch', function(e){
-			
+			ShowModal("scale-modal", 0);
 		});
 	// About
 		// Help
@@ -419,7 +425,7 @@ function addSVGtoDrawboard(elem) {
 	$('.wrapper').append($.parseHTML(stager));
 	
 	// Clear the hinter - the user figured out how to add emoji to the drawboard at this point
-	$('.hinter').remove();
+	$('.hinter').removeClass('hinter');
 	
 	// Append the SVG file to the staging area and subsequently move to the drawboard
 	$('.stagingarea').load(elem.src, function() {
@@ -680,8 +686,16 @@ window.ApplyTransform = ApplyTransform;
 
 // Listen for delete keypress and delete the currently selected path
 $('html').keyup(function(evt) {
-    if (evt.keyCode == 46) {
-        $('.selected').remove();
-    }
+	switch(evt.keyCode) {
+		case 46:
+			$('.selected').remove();
+			break;
+		case 68:
+			$('.selected').removeClass('selected');
+			break;
+		default:
+			break;
+	}
+
 });
 })();

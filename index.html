@@ -26,6 +26,8 @@
 				https://cdnjs.cloudflare.com;
 			script-src 
 				'self' 
+				'unsafe-inline' 
+				https://cdnjs.cloudflare.com
 				'sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=' 
 				'sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=' 
 				'sha256-Kgfoh12kBb0fUrQHV5MwzovU8idK/ero60jMt76NfC8=' 
@@ -41,7 +43,7 @@
 		
 		<!-- Critical Libraries -->
 		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-		<script defer src="js/emojibuilder.js"></script>
+		<script defer src="js/emojibuilder.min.js"></script>
 
 		<!-- Libraries -->
 		<script async src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js" 		 type="text/javascript" integrity="sha256-wpeKFfumxNfqAlC4/AkTbuhMaUp72QxUIjEkyFpH1Jc=" crossorigin="anonymous"></script>
@@ -106,7 +108,7 @@
 										</div>
 									</li>
 									<li><a class="rotate" href="#">Rotate</a></li>
-									<li><a class="backward" href="#">Scale</a></li>
+									<li><a class="scale" href="#">Scale</a></li>
 								</ul>
 							</div>
 						</li>
@@ -205,6 +207,19 @@
 						</div>
 						<div class="uk-modal-footer uk-text-right">
 							<button class="uk-modal-close uk-button uk-button-primary persist-granted" type="button">Grant permission</button>
+							<button class="uk-modal-close uk-button uk-button-default" type="button">Nevermind</button>
+						</div>
+					</div>
+				</div>
+
+				<div id="scale-modal" uk-modal role="dialog">
+					<div class="uk-modal-dialog uk-margin-auto-vertical">
+						<div class="uk-modal-body">
+							<h3>Set the desired scale (default: 1.0)</h3>
+							<label for="scale">Scale:</label> <input name="scale" id="scale-input" type="number" min="0.1" max="100" step="0.1" value="1">
+						</div>
+						<div class="uk-modal-footer uk-text-right">
+							<button class="uk-modal-close uk-button uk-button-primary apply-scale" type="button">Apply</button>
 							<button class="uk-modal-close uk-button uk-button-default" type="button">Nevermind</button>
 						</div>
 					</div>

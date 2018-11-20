@@ -73,10 +73,11 @@ g {
 }
 
 #renderbox {
-	z-index: 3;
-	position: absolute;
-	top: 0;
-	left: 0;
+    padding: 0px;
+    top: 50px;
+    position: absolute;
+    display: block;
+    content: " ";
 }
 
 /* On-page controls
@@ -372,7 +373,8 @@ g {
     }
 	
 	svg {
-		max-width: calc(100% - 40px)
+        max-width: calc(100% - 40px);
+        max-height: calc(100vh - 50px);
     }
     
     .menubar > .uk-navbar-left > .uk-navbar-nav > li > a {
