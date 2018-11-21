@@ -6,8 +6,6 @@ var svg_files;
 
 // Config and enums
 const URLS = Object.freeze({
-	CSP: "https://floris.amsterdam/reports/csp",
-	CSP_ISSUE: "https://github.com/Fdebijl/EmojiBuilder/issues/new?title=CSP%20Violation&body=",
 	WORKERPATH: "/emojiworker.js",
 	SVG_DIR_PATH: "svg/"
 });
@@ -22,35 +20,6 @@ const TRANSFORMS = Object.freeze({
 const FLIPS = Object.freeze({
 	HORIZONTAL: "horizontal",
 	VERTICAL: "vertical"
-});
-
-// Let the user know they need to let me known one of the SHA256 digests has become invalid
-$(window).on('securitypolicyviolation', function(event) {
-	let originalEvent = event.original;
-	let parsedEvent = {
-		time: Date.now(),
-		uri: originalEvent.blockedURI,
-		docuri: originalEvent.documentURI,
-		disposition: originalEvent.disposition,
-		effectivedirective: originalEvent.effectiveDirective,
-		violateddirective: originalEvent.violatedDirective,
-		line: originalEvent.lineNumber,
-		referrer: originalEvent.referrer,
-		sample: originalEvent.sample
-	};
-
-	// Since the user might not be able to create an issue, we also send a report to our own servers
-	$.ajax({
-		url: URLS.CSP,
-		method: "POST",
-		data: parsedEvent
-	})
-	.done(function(data) {
-		let issuelink = `${URLS.CSP_ISSUE}${encodeURI(JSON.stringify(parsedEvent, null, 4))}`
-		$('#csp-issue-link').attr('href', issuelink);
-
-		ShowModal("fatal-modal", 30);
-	});
 });
 
 $(window).on("load", function() {

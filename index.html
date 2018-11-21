@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-	<!-- Made by @fdebijl -->
+	<!-- Made by @fdebanned, emoji courtesy of Twitter @ https://github.com/twitter/twemoji -->
 	<head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<!-- It takes an awfully   L O N G   T A G   to make a long CSP -->
@@ -40,6 +40,32 @@
 		<meta name="description" content="Construct (or destruct) emoji and other abominations from Twitter's open-source emoji.">
 
 		<style>.ui-loader{display: none;}</style>
+		<script>
+			// Let the user know they need to let me known one of the SHA256 digests has become invalid
+			window.addEventListener('securitypolicyviolation', function(event) {
+				
+				
+				let originalEvent = event.original;
+				let parsedEvent = {
+					time: Date.now(),
+					uri: originalEvent.blockedURI,
+					docuri: originalEvent.documentURI,
+					disposition: originalEvent.disposition,
+					effectivedirective: originalEvent.effectiveDirective,
+					violateddirective: originalEvent.violatedDirective,
+					line: originalEvent.lineNumber,
+					referrer: originalEvent.referrer,
+					sample: originalEvent.sample
+				};
+
+				document.getElementById("csp-issue-link").setAttribute("href", `https://github.com/Fdebijl/EmojiBuilder/issues/new?title=CSP%20Violation&body=${encodeURI(JSON.stringify(parsedEvent, null, 4))}`);
+				document.getElementById("fatal-modal").classList.add = "uk-open";
+
+				var request = new XMLHttpRequest();
+				request.open('POST', 'https://floris.amsterdam/reports/csp', true);
+				request.send(parsedEvent);
+			});
+		</script>
 		
 		<!-- Critical Libraries -->
 		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
