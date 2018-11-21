@@ -11,3 +11,7 @@ fetcher/twemoji/
 fetcher/emoji-test\.txt
 
 svg/
+
+css/style\.min\.css
+
+js/emojibuilder\.min\.js
