@@ -283,6 +283,11 @@ g {
     cursor: not-allowed;
 }
 
+#add-emoji-input {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
 /* SVG-specific styles
 ===================================================== */ 
 

@@ -115,7 +115,13 @@ function ControlsAndMenu() {
 
 		$('.saveas').on('click touch', function(evt){
 			ShowModal("save-modal", 0);
-		});
+    });
+    
+  // Add
+    // Add emoji
+    $('.add-emoji').on('click touch', function(e) {
+      emojiToBuilder($('#add-emoji-input').val());
+    });
 
 	// Edit
 		// Delete selected path
@@ -204,20 +210,21 @@ function showGrid(cat) {
 	if (!$('.grid_' + cat).hasClass('loaded')) {
     let files = svg_files.grids[cat];
     if (!files) {
-      console.warn('Error pending, dumpding svg_files:');
+      console.warn('Error pending, dumping svg_files:');
       console.warn(svg_files.grids);
       throw new Error('showGrid received a category  that does not exist in svg_files!')
     }
 		addFilesToGrid(files);
 		$('.grid_' + cat).addClass('loaded');
-	}
-	
-	// Simple fadeout of the currently active grid and callback to show the desired grid
-	$('.grid').fadeOut(333, function() {
-		$('.grid_' + cat).show();
-		$('.tab').removeClass('tab_active');
-		$('.tab_' + cat).addClass('tab_active')
-	});	
+  }
+  
+  // Simple fadeout of the currently active grid and callback to show the desired grid
+  $('.grid').fadeOut(333, function() {
+    $('.grid_' + cat).show();
+    $('.tab').removeClass('tab_active');
+    $('.tab_' + cat).addClass('tab_active')
+  });	
+
 }
 
 // Enable dragging on this element
@@ -373,7 +380,7 @@ async function addFilesToGrid(grid) {
 		// Bind showGrid() to each tab to show the emojigrid for the corresponding category
 		// Bind addSVG to each img to allow click-to-add to the drawboard
 		$('.svg-icon').click(function(e) {
-			addSVGtoDrawboard(this); 
+			addSVGtoDrawboard(this.src); 
 		});
 		
 		// Once again we need to attach the drag-and-drop event handler here to prevent CSP violations
@@ -390,7 +397,7 @@ async function addFilesToGrid(grid) {
 }
 
 // Add this SVG element to the drawboard
-function addSVGtoDrawboard(elem) {
+function addSVGtoDrawboard(src) {
 	// Append staging area to DOM to load SVG in. $.load is destructive so we need a proxy element to prevent clearing the drawboard
 	let stager = '<div class="stagingarea" style="display: none;"></div>';
 	$('.wrapper').append($.parseHTML(stager));
@@ -399,7 +406,7 @@ function addSVGtoDrawboard(elem) {
 	$('.hinter').removeClass('hinter');
 	
 	// Append the SVG file to the staging area and subsequently move to the drawboard
-	$('.stagingarea').load(elem.src, function() {
+	$('.stagingarea').load(src, function() {
 		// Aaaaand move it to the drawboard
 		$('#drawboard').append($('.stagingarea').html());
 
@@ -549,13 +556,13 @@ function ShowModal(modalname, delay = 10) {
 }
 
 function makePathsDraggable() {
-	$('path').each(function() {
+	$('svg > *').each(function() {
 		// Instantiate Draggable on this element
-		new Draggable(this);
-		
+    new Draggable(this);
+
 		// Make each path selectable by click
 		$(this).on("click touch", function(evt) {
-			$('path').removeClass('selected');
+			$('svg > *').removeClass('selected');
 			$(evt.target).addClass('selected');
 		});
 		
@@ -650,6 +657,38 @@ function ApplyTransform(path, name, value) {
 	$(path).attr('transform', transforms.join(" "));
 
 	return transforms.join(" ");
+}
+
+// Spawn a builder emoji from a string emoji
+function emojiToBuilder(emoji) {
+  let codepoint = emoji.codePointAt(0);
+  let hex = codepoint.toString(16).toLowerCase();
+  let src = findSrc(hex);
+  if (!src) {
+    $('#add-emoji-input').val("Not found :(");
+    return;
+  }
+
+  addSVGtoDrawboard(src);
+  // // Find the svg icon that matches the passed emoji
+  // let emojiWeShouldClick = [...document.querySelectorAll('.svg-icon')].filter(icon => {
+  //   return (icon.id == hex);
+  // });
+
+  // $(emojiWeShouldClick[0]).click();
+}
+
+function findSrc(hex) {
+  let src;
+  for(let gridkey in svg_files.grids) {
+    svg_files.grids[gridkey].files.forEach(file => {
+      if ($(file.html)[0].id == hex) {
+        src = $(file.html)[0].src;
+      }
+    });
+  }
+
+  return src || false;
 }
 
 // Allow access to ApplyTransform from anywhere for debug purposes
