@@ -49,11 +49,11 @@ $(window).on("load", function() {
 			if (window.innerWidth <= 500) {
 				// Mobile layout
 				$(window).one('scroll touchmove', function(e){
-					showGrid("smileys");
+					showGrid("SmileysPeople");
 				});
 			} else {
-				// Desktop
-				showGrid("smileys");
+        // Desktop
+        showGrid("SmileysPeople");
 			}
 		});
 	
@@ -198,15 +198,17 @@ function appendSource(evt) {
 	evt.dataTransfer.setData('text/html', evt.target.id);
 }
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
-
 // Show the emojigrid for this tab (passed as category) in the sidebar
 // If the grid hasn't been shown previously we will also load the images here.
 function showGrid(cat) {
 	if (!$('.grid_' + cat).hasClass('loaded')) {
-		addFilesToGrid(svg_files.grids[cat]);
+    let files = svg_files.grids[cat];
+    if (!files) {
+      console.warn('Error pending, dumpding svg_files:');
+      console.warn(svg_files.grids);
+      throw new Error('showGrid received a category  that does not exist in svg_files!')
+    }
+		addFilesToGrid(files);
 		$('.grid_' + cat).addClass('loaded');
 	}
 	
@@ -279,8 +281,8 @@ async function getSVGFilesInDirectory() {
 			// Iterate over directories inside the SVG folder. These are the categories.
 			for (let i = 0; i < data.length; i++) {
 				// Two versions of the gridname: one for scripts and one for displaying in the UI
-				let gridname = data[i].name.replace(" ", "-");
-				let humanname = capitalizeFirstLetter(data[i].name);
+        let gridname = data[i].name.replace(/\W/g, "");
+        let humanname = data[i].name;
 				// Append current category (gridname) to the list emojigrids and tabmenus
 				result.grids[gridname] = {
 					html: '<div class="grid grid_' + gridname + '"></div>',

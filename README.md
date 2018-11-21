@@ -6,7 +6,7 @@ Use Twitter's Open Source SVG emoji to build your own emoji/abominations.
 ## Roadmap:  
 EmojiBuilder is still very much in development, check out the [roadmap project](https://github.com/Fdebijl/EmojiBuilder/projects/1) for all the function that should be implemented shortly. If you think something is missing, put in an issue above!
 
-## Contributing:  
+## Contributing & Building:
 Yes please
 
 Build your local copy by downloading or cloning the repo and doing the following:  
@@ -22,4 +22,16 @@ Build/update the emoji collection by running svg.php - this script is also set t
 sudo apt-get install php && sudo apt-get update
 # Assuming cwd is emojibuilder root
 php -f fetcher/svg.php
+```
+
+When deploying you should only upload
+```
+css
+favicon
+img
+js
+svg
+emojiworker.js
+index.html
+svgs.json
 ```

@@ -8,7 +8,9 @@ self.addEventListener('install', function(event) {
             return cache.addAll([
                 `${PAGE_ROOT}/index.html`,
                 `${PAGE_ROOT}/js/emojibuilder.js`,
+                `${PAGE_ROOT}/js/emojibuilder.min.js`,
                 `${PAGE_ROOT}/css/style.css`,
+                `${PAGE_ROOT}/css/style.min.css`,
                 `${PAGE_ROOT}/svgs.json`,
                 `${PAGE_ROOT}/img/backward.png`,
                 `${PAGE_ROOT}/img/clear.png`,
