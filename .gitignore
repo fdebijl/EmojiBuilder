@@ -4,3 +4,10 @@ yarn.lock
 *.code-workspace
 .htaccess
 .vscode
+fetcher/svg/
+
+fetcher/twemoji/
+
+fetcher/emoji-test\.txt
+
+svg/
