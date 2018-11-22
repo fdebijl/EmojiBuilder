@@ -36,7 +36,7 @@ $(window).on("load", function() {
 	// The CSP prevents inline event binding, so we bind the drag-and-drop listeners here
 	document.getElementById('drawboard').addEventListener('drop', function(event) {
 		event.preventDefault();  
-    	event.stopPropagation();
+    event.stopPropagation();
 		appendEmoji(event);
 	});
 
@@ -52,21 +52,9 @@ $(window).on("load", function() {
 	// Bind all clickhandlers to the menus and on-screen contrls
   ControlsAndMenu();
 
-  if (modeCookie.exists()) {
-    populateSidebar(MODES[modeCookie.get()]);
-  } else {
-    ShowModal('type-modal', 0);
-    $('.select-detailed').on('click touch', function(evt){
-      populateSidebar(MODES.DETAILED);
-      modeCookie.set(MODES.DETAILED);
-    });
-  
-    $('.select-latest').on('click touch', function(evt){
-      populateSidebar(MODES.LATEST);
-      modeCookie.set(MODES.LATEST);
-    });
-  }
-  
+  // Let the user select their emoji type, if they haven't already (determined by cookie)
+  selectEmojiType();
+
 	// Register the serviceworker used to cache all resources
 	if ('serviceWorker' in navigator) {
 		navigator.serviceWorker.register(URLS.WORKERPATH);
@@ -136,6 +124,23 @@ function populateSidebar(mode) {
   });
 }
 
+function selectEmojiType() {
+  if (modeCookie.exists()) {
+    populateSidebar(MODES[modeCookie.get()]);
+  } else {
+    ShowModal('type-modal', 0);
+    $('.select-detailed').on('click touch', function(evt){
+      populateSidebar(MODES.DETAILED);
+      modeCookie.set(MODES.DETAILED);
+    });
+  
+    $('.select-latest').on('click touch', function(evt){
+      populateSidebar(MODES.LATEST);
+      modeCookie.set(MODES.LATEST);
+    });
+  }
+}
+
 // Enable functionality on menubar and other controls
 function ControlsAndMenu() {
 	// Buttons inside modals
@@ -157,7 +162,14 @@ function ControlsAndMenu() {
 		$('.saveas').on('click touch', function(evt){
 			ShowModal("save-modal", 0);
     });
-    
+
+    $('.reselect-type').on('click touch', function(evt){
+      modeCookie.unset();
+      $('.emojigrid').empty();
+      $('.tab:not(.tabheader)').remove();
+			selectEmojiType();
+    });
+
   // Add
     // Add emoji
     $('.add-emoji').on('click touch', function(e) {
@@ -728,12 +740,6 @@ function emojiToBuilder(emoji) {
   }
 
   addSVGtoDrawboard(src);
-  // // Find the svg icon that matches the passed emoji
-  // let emojiWeShouldClick = [...document.querySelectorAll('.svg-icon')].filter(icon => {
-  //   return (icon.id == hex);
-  // });
-
-  // $(emojiWeShouldClick[0]).click();
 }
 
 function findSrc(hex) {
@@ -754,6 +760,9 @@ const modeCookie = {
     let d = new Date();
     d.setTime(d.getTime() + (12*30*24*60*60*1000));
     document.cookie = `preferredMode=${mode};expires=${d.toUTCString()};path=/`;
+  },
+  unset: () => {
+    document.cookie = `preferredMode=; Max-Age=-99999999;`;  
   },
   get: () => {
     let name = 'preferredMode';
