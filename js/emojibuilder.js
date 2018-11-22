@@ -132,11 +132,13 @@ function selectEmojiType() {
     $('.select-detailed').on('click touch', function(evt){
       populateSidebar(MODES.DETAILED);
       modeCookie.set(MODES.DETAILED);
+      mode = MODES.DETAILED;
     });
   
     $('.select-latest').on('click touch', function(evt){
       populateSidebar(MODES.LATEST);
       modeCookie.set(MODES.LATEST);
+      mode = MODES.LATEST;
     });
   }
 }
@@ -449,7 +451,7 @@ async function addFilesToGrid(grid) {
 		// Bind showGrid() to each tab to show the emojigrid for the corresponding category
 		// Bind addSVG to each img to allow click-to-add to the drawboard
 		$('.svg-icon').click(function(e) {
-			addSVGtoDrawboard(this.src); 
+			addSVGtoDrawboard(this.attributes['data-src'].value); 
 		});
 		
 		// Once again we need to attach the drag-and-drop event handler here to prevent CSP violations
@@ -475,7 +477,7 @@ function addSVGtoDrawboard(src) {
 	$('.hinter').removeClass('hinter');
 	
 	// Append the SVG file to the staging area and subsequently move to the drawboard
-	$('.stagingarea').load(src, function() {
+	$('.stagingarea').load(encodeURI(src), function() {
 		// Aaaaand move it to the drawboard
 		$('#drawboard').append($('.stagingarea').html());
 
@@ -626,13 +628,14 @@ function ShowModal(modalname, delay = 10) {
 }
 
 function makePathsDraggable() {
-	$('svg > *').each(function() {
+  let selector = mode == MODES.LATEST ? 'svg > *' : 'path';
+	$(selector).each(function() {
 		// Instantiate Draggable on this element
     new Draggable(this);
 
 		// Make each path selectable by click
 		$(this).on("click touch", function(evt) {
-			$('svg > *').removeClass('selected');
+			$('.selected').removeClass('selected');
 			$(evt.target).addClass('selected');
 		});
 		
@@ -747,7 +750,7 @@ function findSrc(hex) {
   for(let gridkey in svg_files.grids) {
     svg_files.grids[gridkey].files.forEach(file => {
       if ($(file.html)[0].id == hex) {
-        src = $(file.html)[0].src;
+        src = $(file.html)[0].attributes["data-src"].nodeValue;
       }
     });
   }
