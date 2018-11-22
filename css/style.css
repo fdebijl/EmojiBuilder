@@ -221,11 +221,10 @@ g {
 }
 
 .grid {
-	display: none;
-	overflow-y: scroll;
+    display: none;
+    overflow-y: scroll;
   width: 100%;
   height: 80vh;
-  height: fill-available;
 }
 
 /* Menubar

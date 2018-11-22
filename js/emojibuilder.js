@@ -513,6 +513,7 @@ function SaveAsPNG() {
 					let EmojiAsCanvas = document.getElementById('renderbox');
 					let base64blob = EmojiAsCanvas.toDataURL("image/png");
 					let DownloadHelper = document.createElement('a');
+					document.body.appendChild(DownloadHelper);
 					DownloadHelper.href = base64blob;
 					DownloadHelper.download = "emoji.png";
 					DownloadHelper.click();
