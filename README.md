@@ -34,4 +34,5 @@ svg
 emojiworker.js
 index.html
 svgs.json
+manifest.json
 ```
