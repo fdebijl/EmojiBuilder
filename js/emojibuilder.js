@@ -3,6 +3,7 @@
 
 // Allow access to the files from the SVGdir in all methods. This variable is populated in the window.onload event handler.
 var svg_files;
+var pwaEvent;
 
 // Config and enums
 const URLS = Object.freeze({
@@ -46,15 +47,10 @@ $(window).on("load", function() {
 			addGrids(files.grids);
 		})
 		.then(() => {
-			if (window.innerWidth <= 500) {
-				// Mobile layout
-				$(window).one('scroll touchmove', function(e){
-					showGrid("SmileysPeople");
-				});
-			} else {
-        // Desktop
-        showGrid("SmileysPeople");
-			}
+			// Only start loading emoji after the first interaction
+			$(window).one('scroll touchmove mousemove touchend touch click', function(e){
+				showGrid("SmileysPeople");
+			})
 		});
 	
 	// Remove the hint from the drawboard after 15 seconds
@@ -93,6 +89,29 @@ $(window).on("load", function() {
 			})
 		});
 	};
+
+	// Add to home screen button for PWA
+	$(window).on('beforeinstallprompt', event => {
+		event.preventDefault();
+		pwaEvent = event;
+
+		$('.pwa').removeClass('disabled');
+	});
+
+	$('.pwa').on('click touch', function(evt) {
+		pwaEvent.prompt();
+		pwaEvent.userChoice
+			.then(function(choiceResult){
+
+			if (choiceResult.outcome === 'accepted') {
+				console.info('Added application to homescreen.');
+			} else {
+				console.log('Homescreen permission denied.');
+			}
+
+			$('.pwa').addClass('disabled');
+		});
+	});
 });
 
 // Enable functionality on menubar and other controls
