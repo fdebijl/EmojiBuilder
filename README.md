@@ -24,15 +24,17 @@ sudo apt-get install php && sudo apt-get update
 php -f fetcher/svg.php
 ```
 
-When deploying you should only upload
+When deploying you should only upload the following files:
 ```
 css
 favicon
 img
 js
-svg
+svg_detailed
+svg_latest
 emojiworker.js
 index.html
-svgs.json
+svgs_detailed.json
+svgs_latest.json
 manifest.json
 ```

@@ -107,48 +107,65 @@ foreach ($blocks as $chunk) {
 echo('DONE' . PHP_EOL);
 
 // Fetch twemoji and put each into directories, as per the groups fetched from emoji-test.txt
-//TODO: Detect git presence
-if (!is_dir('twemoji')) {
-  echo('RETRIEVING TWEMOJI FROM REPOSITORY - [/fetcher/twemoji] ' . PHP_EOL);
-  shell_exec('git clone https://github.com/twitter/twemoji.git twemoji');
-  echo('DONE.' . PHP_EOL);
-}
+echo('RETRIEVING TWEMOJI FROM REPOSITORY - [/fetcher/twemoji] ' . PHP_EOL);
+shell_exec('git clone https://github.com/twitter/twemoji.git twemoji');
+chdir('twemoji');
+shell_exec('git fetch --all');
+shell_exec('git pull --all');
+chdir('..');
+echo('DONE.' . PHP_EOL);
 
-echo('RESOLVING SEQUENCE TO AVAILABLE TWEMOJI - [/svg].' . PHP_EOL);
+$branches = ['gh-pages' => '_latest', 'tags/v2.4.0' => '_detailed'];
 
-// Completely DESTROY the svg dir if it already exists - we're gonna override it anyway
-if (is_dir('../svg')) {
-  rrmdir('../svg');
-}
+// Get both the latest and the older, detailed version
+foreach($branches as $branchname => $collectionname) {
+  echo('CHECKING OUT REPOSITORY INTO BRANCH ' . $branchname . ' - [/fetcher/twemoji] ' . PHP_EOL);
+  chdir('twemoji');
+  shell_exec('git checkout ' . $branchname);
+  chdir('..');
 
-mkdir('../svg');
+  echo('RESOLVING SEQUENCE TO AVAILABLE TWEMOJI - [/svg' . $collectionname . '].' . PHP_EOL);
 
-// Suppress errors for file-not-found warnings, but do increment the counter so we know how many emoji weren't found.
-$errorcount = 0;
-set_error_handler(function($errno, $errstr) {
-  $errorcount++;
-}, E_WARNING);
+  $svgdir = '../svg' . $collectionname;
+  // Completely DESTROY the svg dir if it already exists - we're gonna override it anyway
+  if (is_dir($svgdir)) {
+    rrmdir($svgdir);
+  }
 
-foreach($emoji as $groupname => $group) {
-  mkdir('../svg/' . $groupname);
-	foreach($group as $subgroup) {
-    foreach($subgroup as $glyph) {
-      $filename = strtolower(str_replace(' ', '-', $glyph['name'])) . '.svg';
-      copy('twemoji/2/svg/' . $filename, '../svg/' . $groupname . '/' . $filename);
+  mkdir($svgdir);
+
+  // Suppress errors for file-not-found warnings, but do increment the counter so we know how many emoji weren't found.
+  $errorcount = 0;
+  set_error_handler(function($errno, $errstr) {
+    $errorcount++;
+  }, E_WARNING);
+
+  foreach($emoji as $groupname => $group) {
+    mkdir($svgdir . '/' . $groupname);
+    foreach($group as $subgroup) {
+      foreach($subgroup as $glyph) {
+        $filename = strtolower(str_replace(' ', '-', $glyph['name'])) . '.svg';
+        copy('twemoji/2/svg/' . $filename, $svgdir . '/' . $groupname . '/' . $filename);
+      }
     }
   }
+
+  if ($errorcount > 0) {
+    echo('WARN: ' . $errorcount . ' EMOJI COULD NOT BE RESOLVED.' . PHP_EOL);
+  }
+
+  echo('DONE.' . PHP_EOL);
 }
 
 restore_error_handler();
 
 //rrmdir('twemoji');
 
-if ($errorcount > 0) {
-  echo('WARN: ' . $errorcount . ' EMOJI COULD NOT BE RESOLVED.' . PHP_EOL);
-}
+echo('GENERATING JSON INDEX FOR RESOLVED LATEST EMOJI - [/svgs_latest.json]' . PHP_EOL);
+file_put_contents("../svgs_latest.json", dir_to_json("../svg_latest"));
 echo('DONE.' . PHP_EOL);
 
-echo('GENERATING JSON INDEX FOR RESOLVED EMOJI - [/svgs.json]' . PHP_EOL);
-file_put_contents("../svgs.json", dir_to_json("../svg"));
+echo('GENERATING JSON INDEX FOR RESOLVED DETAILED EMOJI - [/svgs_detailed.json]' . PHP_EOL);
+file_put_contents("../svgs_detailed.json", dir_to_json("../svg_detailed"));
 echo('DONE, EXITING.' . PHP_EOL);
 ?>
