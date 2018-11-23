@@ -227,6 +227,10 @@ g {
   height: 80vh;
 }
 
+.lazyloading, .lazyload {
+    object-fit: scale-down;
+}
+
 /* Menubar
 ===================================================== */ 
 .menubar {

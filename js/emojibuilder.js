@@ -375,7 +375,7 @@ async function getSVGFilesInDirectory(mode) {
 					// d[1].name = The category. I.e. faces, objects, food, etc.
 					// d[i].dir[i].file = The filename of the emoji. E.g. 1f47d.svg
 					
-					let htmlstring = '<img draggable="true" class="svg-icon lazyload" id="' + data[i].dir[j].file.split(".")[0] + '" data-src="' + directory + data[i].name + "/" + data[i].dir[j].file + '">';
+					let htmlstring = '<img draggable="true" class="svg-icon lazyload" src="img/oval.svg" id="' + data[i].dir[j].file.split(".")[0] + '" data-src="' + directory + data[i].name + "/" + data[i].dir[j].file + '">';
 					let targetgrid = '.grid_' + gridname;
 					result.grids[gridname].files.push({
 						grid: targetgrid,
