@@ -1,3 +1,5 @@
+/* eslint-disable require-jsdoc */
+
 (function() {
   'use strict';
 
@@ -11,46 +13,46 @@
     SVG_DIR_PATH_DETAILED: 'svg_detailed/',
     SVG_DIR_PATH_LATEST: 'svg_latest/',
     JSON_PATH_DETAILED: 'svgs_detailed.json',
-    JSON_PATH_LATEST: 'svgs_latest.json'
+    JSON_PATH_LATEST: 'svgs_latest.json',
   });
 
   const TRANSFORMS = Object.freeze({
     SCALE: 'scale',
     FLIP: 'flip',
     TRANSLATE: 'translate',
-    ROTATE: 'rotate'
+    ROTATE: 'rotate',
   });
 
   const FLIPS = Object.freeze({
     HORIZONTAL: 'horizontal',
-    VERTICAL: 'vertical'
+    VERTICAL: 'vertical',
   });
 
   const MODES = Object.freeze({
-    DETAILED: "DETAILED",
-    LATEST: "LATEST"
+    DETAILED: 'DETAILED',
+    LATEST: 'LATEST',
   });
 
-  $(window).on("load", function() {
+  $(window).on('load', function() {
     // The CSP prevents inline event binding, so we bind the drag-and-drop listeners here
     document
-      .getElementById("drawboard")
-      .addEventListener("drop", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        appendEmoji(event);
-      });
+        .getElementById('drawboard')
+        .addEventListener('drop', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          appendEmoji(event);
+        });
 
     document
-      .getElementById("drawboard")
-      .addEventListener("dragover", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        allowDrop(event);
-      });
+        .getElementById('drawboard')
+        .addEventListener('dragover', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          allowDrop(event);
+        });
 
     // Remove superfluous elements
-    $(".ui-loader").remove();
+    $('.ui-loader').remove();
 
     // Bind all clickhandlers to the menus and on-screen contrls
     ControlsAndMenu();
@@ -59,49 +61,49 @@
     selectEmojiType();
 
     // Register the serviceworker used to cache all resources
-    if ("serviceWorker" in navigator) {
+    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register(URLS.WORKERPATH);
     }
 
     // Check for availability of the persistent storage API
     if (navigator.storage && navigator.storage.persist) {
-      $(".persist").removeClass("disabled");
+      $('.persist').removeClass('disabled');
 
       // Get usage in MB so the user can decide if the space is worth it
       navigator.storage.estimate().then(estimate => {
-        $(".cachesize").html(
-          `${Math.round((estimate.usage / 1000 / 1000) * 100) / 100}MB`
+        $('.cachesize').html(
+            `${Math.round((estimate.usage / 1000 / 1000) * 100) / 100}MB`
         );
       });
 
-      $(".persist").on("click touch", function(evt) {
-        ShowModal("persist-modal", 0);
+      $('.persist').on('click touch', function(evt) {
+        showModal('persist-modal', 0);
       });
 
       // Persistent storage permissions have been granted
-      $(".persist-granted").on("click touch", function(evt) {
+      $('.persist-granted').on('click touch', function(evt) {
         navigator.storage.persist().then(granted => {
-          console.info("Persistent storage permissisons granted.");
+          console.info('Persistent storage permissisons granted.');
         });
       });
     }
 
     // Add to home screen button for PWA
-    window.addEventListener("beforeinstallprompt", event => {
+    window.addEventListener('beforeinstallprompt', event => {
       event.preventDefault();
 
-      $(".pwa").removeClass("disabled");
+      $('.pwa').removeClass('disabled');
 
-      $(".pwa").on("click touch", clickevent => {
+      $('.pwa').on('click touch', clickevent => {
         event.prompt();
         event.userChoice.then(function(choiceResult) {
-          if (choiceResult.outcome === "accepted") {
-            console.info("Added application to homescreen.");
+          if (choiceResult.outcome === 'accepted') {
+            console.info('Added application to homescreen.');
           } else {
-            console.log("Homescreen permission denied.");
+            console.log('Homescreen permission denied.');
           }
 
-          $(".pwa").addClass("disabled");
+          $('.pwa').addClass('disabled');
         });
       });
     });
@@ -112,33 +114,33 @@
     // For desktop clients we load only the first few rows of the 'faces' grid, since that one will be shown by default. Other tabs are loaded
     // in lazily in showGrid().
     getSVGFilesInDirectory(mode)
-      .then(files => {
-        svg_files = files;
-        addTabs(files.tabs);
-        addGrids(files.grids);
-      })
-      .then(() => {
-        showGrid("SmileysPeople");
+        .then(files => {
+          svg_files = files;
+          addTabs(files.tabs);
+          addGrids(files.grids);
+        })
+        .then(() => {
+          showGrid('SmileysPeople');
 
-        // Remove the hint from the drawboard after 15 seconds
-        setTimeout(function() {
-          $(".hinting").removeClass("hinting");
-        }, 15 * 1000);
-      });
+          // Remove the hint from the drawboard after 15 seconds
+          setTimeout(function() {
+            $('.hinting').removeClass('hinting');
+          }, 15 * 1000);
+        });
   }
 
   function selectEmojiType() {
     if (modeCookie.exists()) {
       populateSidebar(MODES[modeCookie.get()]);
     } else {
-      ShowModal("type-modal", 0);
-      $(".select-detailed").on("click touch", function(evt) {
+      showModal('type-modal', 0);
+      $('.select-detailed').on('click touch', function(evt) {
         populateSidebar(MODES.DETAILED);
         modeCookie.set(MODES.DETAILED);
         mode = MODES.DETAILED;
       });
 
-      $(".select-latest").on("click touch", function(evt) {
+      $('.select-latest').on('click touch', function(evt) {
         populateSidebar(MODES.LATEST);
         modeCookie.set(MODES.LATEST);
         mode = MODES.LATEST;
@@ -149,108 +151,108 @@
   // Enable functionality on menubar and other controls
   function ControlsAndMenu() {
     // Buttons inside modals
-    $(".apply-scale").on("click touch", function(evt) {
-      ApplyTransform($(".selected"), TRANSFORMS.SCALE, $("#scale-input").val());
+    $('.apply-scale').on('click touch', function(evt) {
+      applyTransform($('.selected'), TRANSFORMS.SCALE, $('#scale-input').val());
     });
 
     // Menu structure
     // File
     // New file
-    $(".clear").on("click touch", function(evt) {
-      $("#drawboard").empty();
+    $('.clear').on('click touch', function(evt) {
+      $('#drawboard').empty();
     });
 
-    $(".open").on("click touch", function(evt) {
+    $('.open').on('click touch', function(evt) {
       LoadSVG();
     });
 
-    $(".saveas").on("click touch", function(evt) {
-      ShowModal("save-modal", 0);
+    $('.saveas').on('click touch', function(evt) {
+      showModal('save-modal', 0);
     });
 
-    $(".reselect-type").on("click touch", function(evt) {
+    $('.reselect-type').on('click touch', function(evt) {
       modeCookie.unset();
-      $(".emojigrid").empty();
-      $(".tab:not(.tabheader)").remove();
+      $('.emojigrid').empty();
+      $('.tab:not(.tabheader)').remove();
       selectEmojiType();
     });
 
     // Add
     // Add emoji
-    $(".add-emoji").on("click touch", function(e) {
-      emojiToBuilder($("#add-emoji-input").val());
+    $('.add-emoji').on('click touch', function(e) {
+      emojiToBuilder($('#add-emoji-input').val());
     });
 
     // Edit
     // Delete selected path
-    $(".delete").on("click touch", function(e) {
-      $(".selected").remove();
+    $('.delete').on('click touch', function(e) {
+      $('.selected').remove();
     });
 
     // Bring forwards
-    $(".forward").on("click touch", function(e) {
-      $(".selected")
-        .parent()
-        .insertAfter(
-          $(".selected")
-            .parent()
-            .next()
-        );
+    $('.forward').on('click touch', function(e) {
+      $('.selected')
+          .parent()
+          .insertAfter(
+              $('.selected')
+                  .parent()
+                  .next()
+          );
     });
 
     // Push backwards
-    $(".backward").on("click touch", function(e) {
-      $(".selected")
-        .parent()
-        .insertBefore(
-          $(".selected")
-            .parent()
-            .prev()
-        );
+    $('.backward').on('click touch', function(e) {
+      $('.selected')
+          .parent()
+          .insertBefore(
+              $('.selected')
+                  .parent()
+                  .prev()
+          );
     });
 
     // Transform
     // Flip horizontal
-    $(".fliphorizontal").on("click touch", function(e) {
-      ApplyTransform($(".selected"), TRANSFORMS.FLIP, FLIPS.HORIZONTAL);
+    $('.fliphorizontal').on('click touch', function(e) {
+      applyTransform($('.selected'), TRANSFORMS.FLIP, FLIPS.HORIZONTAL);
     });
 
     // Flip vertical
-    $(".flipvertical").on("click touch", function(e) {
-      ApplyTransform($(".selected"), TRANSFORMS.FLIP, FLIPS.VERTICAL);
+    $('.flipvertical').on('click touch', function(e) {
+      applyTransform($('.selected'), TRANSFORMS.FLIP, FLIPS.VERTICAL);
     });
 
     // Rotate 90 clockwise
-    $(".rotate90cw").on("click touch", function(e) {
-      ApplyTransform($(".selected"), TRANSFORMS.ROTATE, 90);
+    $('.rotate90cw').on('click touch', function(e) {
+      applyTransform($('.selected'), TRANSFORMS.ROTATE, 90);
     });
 
     // Rotate 90 counter-clockwise
-    $(".rotate90ccw").on("click touch", function(e) {
-      ApplyTransform($(".selected"), TRANSFORMS.ROTATE, -90);
+    $('.rotate90ccw').on('click touch', function(e) {
+      applyTransform($('.selected'), TRANSFORMS.ROTATE, -90);
     });
 
     // Rotate
-    $(".rotate").on("click touch", function(e) {});
+    $('.rotate').on('click touch', function(e) {});
 
     // Scale
-    $(".scale").on("click touch", function(e) {
-      ShowModal("scale-modal", 0);
+    $('.scale').on('click touch', function(e) {
+      showModal('scale-modal', 0);
     });
     // About
     // Help
-    $(".help").on("click touch", function(evt) {
-      ShowModal("info-modal", 0);
+    $('.help').on('click touch', function(evt) {
+      showModal('info-modal', 0);
     });
 
     // Render the canvas and save as png when the "Save as PNG" button is clicked
-    $(".download-png").on("click touch", function(evt) {
-      SaveAsPNG();
+    $('.download-png').on('click touch', function(evt) {
+      saveAsPNG();
     });
 
     // Same for SVG
-    $(".download-svg").on("click touch", function(evt) {
-      SaveAsSVG();
+    $('.download-svg').on('click touch', function(evt) {
+      saveAsSVG();
     });
   }
 
@@ -263,81 +265,79 @@
   // appendEmoji is used when an element is dropped onto the drawboard.
   // Translate dropped imgs to function call on addSVG()
   function appendEmoji(evt) {
-    addSVGtoDrawboard(
-      document.getElementById(evt.dataTransfer.getData("text/html"))
-    );
+    addSVGtoDrawboard(document.getElementById(evt.dataTransfer.getData('text/html')).attributes['data-src'].value);
   }
 
   // Pass the source element when dragging images so appendEmoji() can parse them onto the drawboard
   function appendSource(evt) {
-    evt.dataTransfer.setData("text/html", evt.target.id);
+    evt.dataTransfer.setData('text/html', evt.target.id);
   }
 
   // Show the emojigrid for this tab (passed as category) in the sidebar
   // If the grid hasn't been shown previously we will also load the images here.
   function showGrid(cat) {
-    if (!$(".grid_" + cat).hasClass("loaded")) {
-      let files = svg_files.grids[cat];
+    if (!$('.grid_' + cat).hasClass('loaded')) {
+      const files = svg_files.grids[cat];
       if (!files) {
-        console.warn("Error pending, dumping svg_files:");
+        console.warn('Error pending, dumping svg_files:');
         console.warn(svg_files.grids);
         throw new Error(
-          "showGrid received a category  that does not exist in svg_files!"
+            'showGrid received a category  that does not exist in svg_files!'
         );
       }
       addFilesToGrid(files);
-      $(".grid_" + cat).addClass("loaded");
+      $('.grid_' + cat).addClass('loaded');
     }
 
     // Simple fadeout of the currently active grid and callback to show the desired grid
-    $(".grid").fadeOut(333, function() {
-      $(".grid_" + cat).show();
-      $(".tab").removeClass("tab_active");
-      $(".tab_" + cat).addClass("tab_active");
+    $('.grid').fadeOut(333, function() {
+      $('.grid_' + cat).show();
+      $('.tab').removeClass('tab_active');
+      $('.tab_' + cat).addClass('tab_active');
     });
   }
 
   // Enable dragging on this element
   function Draggable(elem) {
     // Rewritten from https://stackoverflow.com/questions/41514967/
-    let target = elem;
+    const target = elem;
 
     // Create SVG points for capturing...
     // clickpoint: ... where the cursor is relative to the rest of the path
     // lastMove: ... the last transformation applied to this element
     // currentMove .. the current transformation to apply
-    let lastMove = target.ownerSVGElement.createSVGPoint();
+    const lastMove = target.ownerSVGElement.createSVGPoint();
     let clickPoint = target.ownerSVGElement.createSVGPoint();
-    let currentMove = target.ownerSVGElement.createSVGPoint();
+    const currentMove = target.ownerSVGElement.createSVGPoint();
 
-    $(target).on("pointerdown", function(evt) {
+    $(target).on('pointerdown', function(evt) {
       evt.preventDefault();
       clickPoint = globalToLocalCoords(evt.clientX, evt.clientY);
-      $(target).addClass("dragged");
-      $(target.ownerSVGElement).on("pointermove", target, function(evt) {
-        let p = globalToLocalCoords(evt.clientX, evt.clientY);
+      $(target).addClass('dragged');
+      $(target.ownerSVGElement).on('pointermove', target, function(evt) {
+        const p = globalToLocalCoords(evt.clientX, evt.clientY);
         currentMove.x = lastMove.x + (p.x - clickPoint.x);
         currentMove.y = lastMove.y + (p.y - clickPoint.y);
-        ApplyTransform(
-          target,
-          "translate",
-          currentMove.x + "," + currentMove.y
+        applyTransform(
+            target,
+            'translate',
+            currentMove.x + ',' + currentMove.y
         );
       });
 
-      $(target.ownerSVGElement).on("pointerup", target, function(evt) {
+      $(target.ownerSVGElement).on('pointerup', target, function(evt) {
         lastMove.x = currentMove.x;
         lastMove.y = currentMove.y;
-        $(target).removeClass("dragged");
-        $(target.ownerSVGElement).off("pointermove");
-        $(target.ownerSVGElement).off("pointerup");
+        $(target).removeClass('dragged');
+        $(target.ownerSVGElement).off('pointermove');
+        $(target.ownerSVGElement).off('pointerup');
       });
     });
 
     // Convert DOM coordinates to SVG coordinates so we can apply a translation to this path accordingly
     function globalToLocalCoords(x, y) {
-      let p = target.ownerSVGElement.createSVGPoint();
-      let m = target.parentNode.getScreenCTM();
+      const p = target.ownerSVGElement.createSVGPoint();
+      const m = target.parentNode.getScreenCTM();
       p.x = x;
       p.y = y;
       return p.matrixTransform(m.inverse());
@@ -367,32 +367,32 @@
 
     return new Promise((resolve, reject) => {
       $.ajax({
-        url: json
+        url: json,
       }).done(function(data) {
-        let result = {
+        const result = {
           tabs: [],
-          grids: {}
+          grids: {},
         };
 
         // Iterate over directories inside the SVG folder. These are the categories.
         for (let i = 0; i < data.length; i++) {
           // Two versions of the gridname: one for scripts and one for displaying in the UI
-          let gridname = data[i].name.replace(/\W/g, "");
-          let humanname = data[i].name;
+          const gridname = data[i].name.replace(/\W/g, '');
+          const humanname = data[i].name;
           // Append current category (gridname) to the list emojigrids and tabmenus
           result.grids[gridname] = {
             html: '<div class="grid grid_' + gridname + '"></div>',
-            files: []
+            files: [],
           };
 
           result.tabs.push(
-            '<div class="tab tab_' +
+              '<div class="tab tab_' +
               gridname +
               '" data-cat="' +
               gridname +
               '">' +
               humanname +
-              "</div>"
+              '</div>'
           );
 
           // Iterate over files in directory d[i]. These are the emoji themselves.
@@ -401,19 +401,19 @@
             // d[1].name = The category. I.e. faces, objects, food, etc.
             // d[i].dir[i].file = The filename of the emoji. E.g. 1f47d.svg
 
-            let htmlstring =
+            const htmlstring =
               '<img draggable="true" class="svg-icon lazyload" src="img/oval.svg" id="' +
-              data[i].dir[j].file.split(".")[0] +
+              data[i].dir[j].file.split('.')[0] +
               '" data-src="' +
               directory +
               data[i].name +
-              "/" +
+              '/' +
               data[i].dir[j].file +
               '">';
-            let targetgrid = ".grid_" + gridname;
+            const targetgrid = '.grid_' + gridname;
             result.grids[gridname].files.push({
               grid: targetgrid,
-              html: htmlstring
+              html: htmlstring,
             });
           }
         }
@@ -428,14 +428,14 @@
       // Asynchronously add every category to the tab menu
       tabs.forEach(async tab => {
         return new Promise((resolve, reject) => {
-          $(".tabs").append(tab);
+          $('.tabs').append(tab);
           resolve();
         });
       });
 
       // Bind showGrid() to each tab to show the emojigrid for the corresponding category
-      $(".tabs > div").click(function(e) {
-        showGrid($(this).data("cat"));
+      $('.tabs > div').click(function(e) {
+        showGrid($(this).data('cat'));
       });
 
       resolve();
@@ -450,7 +450,7 @@
       // We will later append the emoji themselves to these grids
       Object.entries(grids).forEach(async grid => {
         return new Promise((resolve, reject) => {
-          $(".emojigrid").append(grid[1].html);
+          $('.emojigrid').append(grid[1].html);
           resolve();
         });
       });
@@ -484,15 +484,15 @@
 
       // Bind showGrid() to each tab to show the emojigrid for the corresponding category
       // Bind addSVG to each img to allow click-to-add to the drawboard
-      $(".svg-icon").click(function(e) {
-        addSVGtoDrawboard(this.attributes["data-src"].value);
+      $('.svg-icon').click(function(e) {
+        addSVGtoDrawboard(this.attributes['data-src'].value);
       });
 
       // Once again we need to attach the drag-and-drop event handler here to prevent CSP violations
       // jQuery's bind doesn't properly pass event.dataTransfer, so we opt to use vanilla JS here
-      let svgicons = document.getElementsByClassName("svg-icon");
+      const svgicons = document.getElementsByClassName('svg-icon');
       Array.from(svgicons).forEach(function(element) {
-        element.addEventListener("dragstart", function(event) {
+        element.addEventListener('dragstart', function(event) {
           appendSource(event);
         });
       });
@@ -504,24 +504,24 @@
   // Add this SVG element to the drawboard
   function addSVGtoDrawboard(src) {
     // Append staging area to DOM to load SVG in. $.load is destructive so we need a proxy element to prevent clearing the drawboard
-    let stager = '<div class="stagingarea" style="display: none;"></div>';
-    $(".wrapper").append($.parseHTML(stager));
+    const stager = '<div class="stagingarea" style="display: none;"></div>';
+    $('.wrapper').append($.parseHTML(stager));
 
     // Clear the hinter - the user figured out how to add emoji to the drawboard at this point
-    $(".hinter").removeClass("hinter");
+    $('.hinter').removeClass('hinter');
 
     // Append the SVG file to the staging area and subsequently move to the drawboard
-    $(".stagingarea").load(encodeURI(src), function() {
+    $('.stagingarea').load(encodeURI(src), function() {
       // Aaaaand move it to the drawboard
-      $("#drawboard").append($(".stagingarea").html());
+      $('#drawboard').append($('.stagingarea').html());
 
       // Remove all clipping paths (i.e. masks) that prevent SVG movement outside of the bounding box.
       // All metadata tags are also stripped because there's really no good reason to have it in here for our purposes.
-      $("defs").remove();
-      $("metadata").remove();
+      $('defs').remove();
+      $('metadata').remove();
 
       // Destroy the staging area
-      $(".stagingarea").remove();
+      $('.stagingarea').remove();
 
       // Done, let's make it draggable
       makePathsDraggable();
@@ -531,121 +531,120 @@
   function addSVGstring(svgstring) {
     // Same story as addSVG, but we load from a string instead of a file
     // DRY VIOLATIONS REEEEEEEEEEEEEEEEEEEE
-    let stager = '<div class="stagingarea" style="display: none;"></div>';
-    $(".wrapper").append($.parseHTML(stager));
+    const stager = '<div class="stagingarea" style="display: none;"></div>';
+    $('.wrapper').append($.parseHTML(stager));
 
-    $(".hinter").remove();
+    $('.hinter').remove();
 
     // Append the SVG string to the staging area and subsequently move to the drawboard
-    $(".stagingarea").html(svgstring);
-    $("#drawboard").append($(".stagingarea").html());
-    $("defs").remove();
-    $("metadata").remove();
-    $(".stagingarea").remove();
+    $('.stagingarea').html(svgstring);
+    $('#drawboard').append($('.stagingarea').html());
+    $('defs').remove();
+    $('metadata').remove();
+    $('.stagingarea').remove();
 
     makePathsDraggable();
   }
 
-  function SaveAsPNG() {
+  function saveAsPNG() {
     // Show loading overlay
-    UIkit.modal(document.getElementById("loading-modal")).show();
+    UIkit.modal(document.getElementById('loading-modal')).show();
 
     // Make a temporary canvas to dump all the SVG to and append it to the DOM
-    let renderbox = '<canvas id="renderbox"></canvas>';
-    $(".wrapper").append($.parseHTML(renderbox));
+    const renderbox = '<canvas id="renderbox"></canvas>';
+    $('.wrapper').append($.parseHTML(renderbox));
 
     // Set the appropriate dimensions for the renderbox and SVG elements so canvg doesn't get confused from the 100%/100vh we have on the SVGs
-    $("#renderbox, #drawboard > svg").width($("#drawboard").outerWidth());
-    $("#renderbox, #drawboard > svg").height($("#drawboard").outerHeight());
+    $('#renderbox, #drawboard > svg').width($('#drawboard').outerWidth());
+    $('#renderbox, #drawboard > svg').height($('#drawboard').outerHeight());
 
     // Get all the SVG elements on the drawboard and save it as a string canvg will use later on
-    let drawboardContent = "";
+    let drawboardContent = '';
 
     // If we have just one emoji, we only need the base HTML
-    if ($("#drawboard > svg").length === 1) {
+    if ($('#drawboard > svg').length === 1) {
       // Remove all comments and strip whitespace from the single SVG element
       drawboardContent = $.trim(
-        $("#drawboard")
-          .html()
-          .replace(/<!--[\s\S]*?-->/gi, "")
+          $('#drawboard')
+              .html()
+              .replace(/<!--[\s\S]*?-->/gi, '')
       );
     } else {
       // If we have more than one emoji we'll need to merge them to one grand SVG, for this we need a new element to do some DOM manipulation
-      let mergehelper =
-        '<div class="mergehelper" style="display: none;"></div>';
-      $(".wrapper").append($.parseHTML(mergehelper));
-      $(".mergehelper").html($("#drawboard").html());
+      const mergehelper = '<div class="mergehelper" style="display: none;"></div>';
+      $('.wrapper').append($.parseHTML(mergehelper));
+      $('.mergehelper').html($('#drawboard').html());
 
       // Remove all XML comments to prevent fuckery later on
-      $(".mergehelper").html(
-        $(".mergehelper")
-          .html()
-          .replace(/<!--[\s\S]*?-->/gi, "")
+      $('.mergehelper').html(
+          $('.mergehelper')
+              .html()
+              .replace(/<!--[\s\S]*?-->/gi, '')
       );
 
-      let SVGinMergeHelper = $(".mergehelper > svg");
+      const SVGinMergeHelper = $('.mergehelper > svg');
 
       // Append all subsequent SVG elements to the first
       for (let i = 1; i < SVGinMergeHelper.length; i++) {
-        let t = $(SVGinMergeHelper[i]).html();
-        $(".mergehelper > svg")
-          .eq(0)
-          .append(t);
+        const t = $(SVGinMergeHelper[i]).html();
+        $('.mergehelper > svg')
+            .eq(0)
+            .append(t);
         $(SVGinMergeHelper[i]).remove();
       }
 
-      drawboardContent = $.trim($(".mergehelper").html());
+      drawboardContent = $.trim($('.mergehelper').html());
     }
 
     // Reset the dimensions on the SVGs in the drawboard
-    $("svg")
-      .css("width", "auto")
-      .css("height", "auto");
+    $('svg')
+        .css('width', 'auto')
+        .css('height', 'auto');
 
     // Convert the SVG in the renderbox to PNG
-    canvg("renderbox", drawboardContent, {
+    canvg('renderbox', drawboardContent, {
       renderCallback: function() {
         // Wait 333ms for each SVG to make sure canvg is done rendering
         setTimeout(function() {
-          let EmojiAsCanvas = document.getElementById("renderbox");
-          let base64blob = EmojiAsCanvas.toDataURL("image/png");
-          let DownloadHelper = document.createElement("a");
+          const EmojiAsCanvas = document.getElementById('renderbox');
+          const base64blob = EmojiAsCanvas.toDataURL('image/png');
+          const DownloadHelper = document.createElement('a');
           document.body.appendChild(DownloadHelper);
           DownloadHelper.href = base64blob;
-          DownloadHelper.download = "emoji.png";
+          DownloadHelper.download = 'emoji.png';
           DownloadHelper.click();
 
           // Remove all temporary elements from DOM
           $(DownloadHelper).remove();
-          UIkit.modal(document.getElementById("loading-modal")).hide();
-          $("#renderbox, .mergehelper").remove();
-        }, $("#drawboard > svg").length * 333);
-      }
+          UIkit.modal(document.getElementById('loading-modal')).hide();
+          $('#renderbox, .mergehelper').remove();
+        }, $('#drawboard > svg').length * 333);
+      },
     });
   }
 
   // Save the drawboard to an SVG file the user can come back to edit later on
-  function SaveAsSVG() {
+  function saveAsSVG() {
     // This is a lot easier than PNG since we can just dump the entire contents of the drawboard to a file.
     // Note that this will only produce a valid SVG file if the user has added just one emoji to the drawboard.
     // Our custom loader will work just fine with more than one emoji, however.
-    let url =
-      "data:image/svg+xml;charset=utf-8," +
-      encodeURIComponent($("#drawboard").html());
-    let DownloadHelper = document.createElement("a");
+    const url =
+      'data:image/svg+xml;charset=utf-8,' +
+      encodeURIComponent($('#drawboard').html());
+    const DownloadHelper = document.createElement('a');
     DownloadHelper.href = url;
-    DownloadHelper.download = "emoji.svg";
+    DownloadHelper.download = 'emoji.svg';
     DownloadHelper.click();
     $(DownloadHelper).remove();
   }
 
   // Load an SVG file and display it to the drawboard
   function LoadSVG() {
-    let input = $(document.createElement("input"));
-    input.attr("type", "file");
-    input.on("change", function(evt) {
-      let file = this.files[0];
-      let reader = new FileReader();
+    const input = $(document.createElement('input'));
+    input.attr('type', 'file');
+    input.on('change', function(evt) {
+      const file = this.files[0];
+      const reader = new FileReader();
 
       reader.onload = (function(resultfile) {
         return function(e) {
@@ -662,7 +661,7 @@
   }
 
   // Show a modal for a specified period of time. Defaults to displaying the modal for 10 seconds.
-  function ShowModal(modalname, delay = 10) {
+  function showModal(modalname, delay = 10) {
     if (delay > 0) {
       UIkit.modal(document.getElementById(modalname)).show();
       setTimeout(function() {
@@ -674,15 +673,15 @@
   }
 
   function makePathsDraggable() {
-    let selector = mode == MODES.LATEST ? "svg > *" : "path";
+    const selector = mode == MODES.LATEST ? 'svg > *' : 'path';
     $(selector).each(function() {
       // Instantiate Draggable on this element
       new Draggable(this);
 
       // Make each path selectable by click
-      $(this).on("click touch", function(evt) {
-        $(".selected").removeClass("selected");
-        $(evt.target).addClass("selected");
+      $(this).on('click touch', function(evt) {
+        $('.selected').removeClass('selected');
+        $(evt.target).addClass('selected');
       });
     });
   }
@@ -691,13 +690,13 @@
   // Calling signature examples:
   // 		ApplyTransform($('.selected'), TRANSFORMS.ROTATE, 90);
   //		ApplyTransform($('.selected'), TRANSFORMS.FLIP, FLIPS.HORIZONTAL);
-  function ApplyTransform(path, name, value) {
+  function applyTransform(path, name, value) {
     // All parameters are required
     if (!path || !name || !value) {
       throw new Error(
-        `Attempted to apply transformation to path with missing arguments:${
-          path ? "" : " path"
-        }${name ? "" : " name"} ${value ? "" : " value"}`
+          `Attempted to apply transformation to path with missing arguments:${
+          path ? '' : ' path'
+          }${name ? '' : ' name'} ${value ? '' : ' value'}`
       );
     }
 
@@ -709,23 +708,21 @@
       name = TRANSFORMS.SCALE;
     }
 
-    let transforms = $(path).attr("transform");
+    let transforms = $(path).attr('transform');
     // If no transformation is applied to this element we will continue with an empty array. The new transformation will be pushed to this array later on.
     // We cant just split on " " since scale contains a space, so we split on a space followed by a letter and filter out elements that are just a space.
     transforms = transforms
       ? transforms
           .split(/( )(?=[a-z])/gi)
-          .filter(transform => transform !== " ")
+          .filter((transform) => transform !== ' ')
       : [];
 
     // Transforms all have the signature 'name(value)', so we can retrieve the name by getting every char ahead of the first parenthesis
-    let targettransformindex = transforms.findIndex(
-      transform => transform.split("(")[0] === name
-    );
+    const targettransformindex = transforms.findIndex((transform) => transform.split('(')[0] === name);
 
     // Make sure both x and y are populated if only x is passed for scale transforms.
-    if (name === TRANSFORMS.SCALE && value.split(" ").length !== 2 && !flip) {
-      value = value + " " + value;
+    if (name === TRANSFORMS.SCALE && value.split(' ').length !== 2 && !flip) {
+      value = value + ' ' + value;
     }
 
     // Flips (both horizontal and vertical) are applied using a negative value on the scale transform. We maintains those negatives here.
@@ -735,13 +732,13 @@
       let currentvalue;
       try {
         currentvalue = transforms[targettransformindex]
-          .match(/\((.+?)\)/g)[0]
-          .replace(/\(|\)/g, "");
+            .match(/\((.+?)\)/g)[0]
+            .replace(/\(|\)/g, '');
       } catch (e) {
-        currentvalue = "1 1";
+        currentvalue = '1 1';
       }
-      let currentx = currentvalue.split(" ")[0],
-        currenty = currentvalue.split(" ")[1];
+      let currentx = currentvalue.split(' ')[0],
+        currenty = currentvalue.split(' ')[1];
       let newx, newy;
 
       if (flip) {
@@ -760,25 +757,25 @@
         } else {
           // Value must either be horizontal or vertical
           throw new Error(
-            `Attempted to apply flip with invalid value '${value}'`
+              `Attempted to apply flip with invalid value '${value}'`
           );
         }
       } else {
-        newx = value.split(" ")[0];
-        newy = value.split(" ")[1];
+        newx = value.split(' ')[0];
+        newy = value.split(' ')[1];
         // We need to apply a scale, but not a flip. Since flips are applied using negative or positive values we have to maintain the negative or positive value when applying a scale
         newx = currentx < 0 ? newx * -1 : newx;
         newy = currenty < 0 ? newy * -1 : newy;
       }
 
-      value = newx + " " + newy;
+      value = newx + ' ' + newy;
     }
 
     // If targettransformindex is greater than or equal to 0, the target path already has a value for the desired transformation. We'll mutate that value right here.
     if (targettransformindex >= 0) {
       // The regex finds the old value, which will be between parentheses, and replaces it with our own value.
       transforms[targettransformindex] = transforms[
-        targettransformindex
+          targettransformindex
       ].replace(/\((.+?)\)/g, `(${value})`);
     } else {
       // If targettransformindex is -1, we need to create the transformation ourselves and append it to the attribute.
@@ -789,18 +786,18 @@
     // See https://drafts.csswg.org/css-transforms-1/#transform-rendering at point 3
     transforms.sort().reverse();
 
-    $(path).attr("transform", transforms.join(" "));
+    $(path).attr('transform', transforms.join(' '));
 
-    return transforms.join(" ");
+    return transforms.join(' ');
   }
 
   // Spawn a builder emoji from a string emoji
   function emojiToBuilder(emoji) {
-    let codepoint = emoji.codePointAt(0);
-    let hex = codepoint.toString(16).toLowerCase();
-    let src = findSrc(hex);
+    const codepoint = emoji.codePointAt(0);
+    const hex = codepoint.toString(16).toLowerCase();
+    const src = findSrc(hex);
     if (!src) {
-      $("#add-emoji-input").val("Not found :(");
+      $('#add-emoji-input').val('Not found :(');
       return;
     }
 
@@ -809,10 +806,10 @@
 
   function findSrc(hex) {
     let src;
-    for (let gridkey in svg_files.grids) {
+    for (const gridkey in svg_files.grids) {
       svg_files.grids[gridkey].files.forEach(file => {
         if ($(file.html)[0].id == hex) {
-          src = $(file.html)[0].attributes["data-src"].nodeValue;
+          src = $(file.html)[0].attributes['data-src'].nodeValue;
         }
       });
     }
@@ -821,8 +818,8 @@
   }
 
   const modeCookie = {
-    set: mode => {
-      let d = new Date();
+    set: (mode) => {
+      const d = new Date();
       d.setTime(d.getTime() + 12 * 30 * 24 * 60 * 60 * 1000);
       document.cookie = `preferredMode=${mode};expires=${d.toUTCString()};path=/`;
     },
@@ -830,12 +827,12 @@
       document.cookie = `preferredMode=; Max-Age=-99999999;`;
     },
     get: () => {
-      let name = "preferredMode";
-      let decodedCookie = decodeURIComponent(document.cookie);
-      let ca = decodedCookie.split(";");
+      const name = 'preferredMode';
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
       for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) == " ") {
+        while (c.charAt(0) == ' ') {
           c = c.substring(1);
         }
         if (c.indexOf(name) == 0) {
@@ -847,20 +844,20 @@
     },
     exists: () => {
       return !!modeCookie.get();
-    }
+    },
   };
 
   // Allow access to ApplyTransform from anywhere for debug purposes
-  window.ApplyTransform = ApplyTransform;
+  window.applyTransform = applyTransform;
 
   // Listen for delete keypress and delete the currently selected path
-  $("html").keyup(function(evt) {
+  $('html').keyup(function(evt) {
     switch (evt.keyCode) {
       case 46:
-        $(".selected").remove();
+        $('.selected').remove();
         break;
       case 68:
-        $(".selected").removeClass("selected");
+        $('.selected').removeClass('selected');
         break;
       default:
         break;
